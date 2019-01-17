@@ -7,6 +7,9 @@ import Lyrics from '../components/subcomponents/Lyrics.vue'
 import Tracks from '../components/subcomponents/Tracks.vue'
 import Login from '../components/Login.vue'
 
+//import firebase from 'firebase'
+const fb = require('../firebaseConfig.js')
+
 Vue.use(Router)
 
 const router = new Router({
@@ -57,7 +60,8 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(x => x.meta.requiresAuth)
-  const currentUser = firebase.auth().currentUser
+  const currentUser = fb.auth.currentUser
+  console.log(currentUser)
 
   if (requiresAuth && !currentUser) {
       next('/login')

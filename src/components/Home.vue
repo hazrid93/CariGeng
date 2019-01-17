@@ -8,12 +8,21 @@
             app
             >
                 <v-list dense>
-                    <v-list-tile @click.prevent="goToMenu">
+                    <v-list-tile @click.prevent="goToHome">
                         <v-list-tile-action>
                             <v-icon>home</v-icon>
                         </v-list-tile-action>
                         <v-list-tile-content>
                             <v-list-tile-title>Return</v-list-tile-title>
+                        </v-list-tile-content>
+                    </v-list-tile>
+
+                    <v-list-tile @click.prevent="goToMenu">
+                        <v-list-tile-action>
+                            <v-icon>explore</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-content>
+                            <v-list-tile-title>Menu</v-list-tile-title>
                         </v-list-tile-content>
                     </v-list-tile>
 
@@ -71,6 +80,10 @@
         },
         methods: {
             goToMenu: function(){
+                this.$router.push('/menu');
+                this.drawer = false;
+            },
+            goToHome: function(){
                 this.$router.push('/home');
                 this.drawer = false;
             }

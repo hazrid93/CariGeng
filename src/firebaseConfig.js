@@ -3,13 +3,13 @@ import 'firebase/firestore'
 
 // firebase init goes here
 const config = {
-    apiKey: "",
-    authDomain: "",
-    databaseURL: "",
-    projectId: "",
-    storageBucket: "",
-    messagingSenderId: ""
-}
+    apiKey: "AIzaSyCMXzv3qHr7nhO6lVN7uPh85GBOO0pyR44",
+    authDomain: "my-project-1536942914988.firebaseapp.com",
+    databaseURL: "https://my-project-1536942914988.firebaseio.com",
+    projectId: "my-project-1536942914988",
+    storageBucket: "my-project-1536942914988.appspot.com",
+    messagingSenderId: "571219777796"
+  };
 firebase.initializeApp(config)
 
 // firebase utils

@@ -1,16 +1,26 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+const fb = require('./firebaseConfig.js')
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        theme: null
+        theme: null,    
+        currentUser: null,
+        userProfile: {}
+
     },
     //mutations are synhcronous
     mutations: {
         changeTheme(state) {
             state.theme = 'black';
+        },
+        setCurrentUser(state, val) {
+          state.currentUser = val
+        },
+        setUserProfile(state, val) {
+            state.userProfile = val
         }
     },
     //actions are asynchronous
@@ -18,7 +28,15 @@ export default new Vuex.Store({
         setThemeInitial({commit}) {
             commit('changeTheme');
             console.log("vuex called");
-        }
+        },
+        fetchUserProfile({ commit, state }) {
+          fb.usersCollection.doc(state.currentUser.uid).get().then(res => {
+              commit('setUserProfile', res.data())
+              console.log(res.data())
+          }).catch(err => {
+              console.log(err)
+          })
+        } 
     },
     getters: {
 
