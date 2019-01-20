@@ -6,6 +6,7 @@ import Apod from '../components/subcomponents/Apod.vue'
 import Lyrics from '../components/subcomponents/Lyrics.vue'
 import Tracks from '../components/subcomponents/Tracks.vue'
 import Profile from '../components/subcomponents/Profile.vue'
+import Settings from '../components/subcomponents/Settings.vue'
 import Login from '../components/Login.vue'
 
 //import firebase from 'firebase'
@@ -44,7 +45,12 @@ const router = new Router({
           path: 'profile',
           name: 'Profile',
           component: Profile
-        }   
+        },
+        {
+          path: 'settings',
+          name: 'Settings',
+          component: Settings
+        }  
       ]
     },
     {

@@ -26,6 +26,15 @@
                         </v-list-tile-content>
                     </v-list-tile>
 
+                    <v-list-tile @click.prevent="">
+                        <v-list-tile-action>
+                            <v-icon>build</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-content>
+                            <v-list-tile-title><router-link to="/home/settings" tag="li" active-class="active" exact>Settings</router-link></v-list-tile-title>
+                        </v-list-tile-content>
+                    </v-list-tile>
+
                     <v-list-tile @click.prevent="userProfileMenu">
                         <v-list-tile-action>
                             <v-icon>account_circle</v-icon>
