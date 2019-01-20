@@ -17,6 +17,24 @@
                         </v-list-tile-content>
                     </v-list-tile>
 
+                    <v-list-tile @click.prevent="logoutUser">
+                        <v-list-tile-action>
+                            <v-icon>cancel</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-content>
+                            <v-list-tile-title>LogOut</v-list-tile-title>
+                        </v-list-tile-content>
+                    </v-list-tile>
+
+                    <v-list-tile @click.prevent="userProfileMenu">
+                        <v-list-tile-action>
+                            <v-icon>account_circle</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-content>
+                            <v-list-tile-title><router-link to="/home/profile" tag="li" active-class="active" exact>Profile</router-link></v-list-tile-title>
+                        </v-list-tile-content>
+                    </v-list-tile>
+
                     <v-list-tile @click.prevent="goToMenu">
                         <v-list-tile-action>
                             <v-icon>explore</v-icon>
@@ -48,6 +66,7 @@
                 </v-toolbar-items>
             </v-toolbar>
             <v-content>
+               <!-- <p>{{ currentUser }}</p> -->
                 <router-view/>
             </v-content>
             <v-footer color="blue" app>
@@ -72,6 +91,8 @@
 
 <script>
     import axios from 'axios'
+    const fb = require('../firebaseConfig.js')
+
     export default {
         data: function() {
             return {
@@ -86,6 +107,22 @@
             goToHome: function(){
                 this.$router.push('/home');
                 this.drawer = false;
+            },
+            logoutUser: function(){ 
+                fb.auth.signOut().then(()=> {
+                    this.$store.dispatch('clearData')
+                    this.$router.push('/login')
+                }).catch(err => {
+                    console.log(err)
+                })
+            }
+        },
+        computed:{
+            userProfile: function(){
+               return this.$store.getters.getUserProfile
+            },
+            currentUser: function(){
+                return this.$store.getters.getCurrentUser
             }
         },
         created: function(){

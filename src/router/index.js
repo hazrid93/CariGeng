@@ -5,6 +5,7 @@ import Menu from '../components/Menu.vue'
 import Apod from '../components/subcomponents/Apod.vue'
 import Lyrics from '../components/subcomponents/Lyrics.vue'
 import Tracks from '../components/subcomponents/Tracks.vue'
+import Profile from '../components/subcomponents/Profile.vue'
 import Login from '../components/Login.vue'
 
 //import firebase from 'firebase'
@@ -38,7 +39,12 @@ const router = new Router({
           path: 'tracks',
           name: 'Tracks',
           component: Tracks
-        }       
+        },
+        {
+          path: 'profile',
+          name: 'Profile',
+          component: Profile
+        }   
       ]
     },
     {
@@ -61,7 +67,7 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(x => x.meta.requiresAuth)
   const currentUser = fb.auth.currentUser
-  console.log(currentUser)
+  //console.log(currentUser)
 
   if (requiresAuth && !currentUser) {
       next('/login')
