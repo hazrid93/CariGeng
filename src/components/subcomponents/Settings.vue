@@ -1,27 +1,44 @@
 <template>
     <div>
-        <template>
-            <section id="settings">
-                <div class="col1">
-                    <h3>Settings</h3>
-                    <p>Update your profile</p>
+        <v-container>
+            <v-layout justify-center align-center column fill-height>
+                <v-flex xs10>
+                    <h3 class="font-weight-black">Settings</h3>
+                    <p class="font-weight-light">Update your profile</p>
 
                     <transition name="fade">
-                        <p v-if="showSuccess" class="success">profile updated</p>
+                        <v-alert
+                        :value="true"
+                        type="success"
+                        style="max-height: 20px;"
+                        outline
+                        >
+                        SUCCESS
+                        </v-alert>
                     </transition>
 
-                    <form @submit.prevent>
-                        <label for="name">Name</label>
-                        <input v-model.trim="name" type="text" :placeholder="userProfile.name" id="name" />
+                    <v-form @submit.prevent>
+                        <v-text-field
+                            label="Name"
+                            v-model.trim="name"
+                            type="text"
+                            :placeholder="userProfile.name" 
+                            id="name"
+                        ></v-text-field>
 
-                        <label for="title">Job Title</label>
-                        <input v-model.trim="title" type="text" :placeholder="userProfile.title" id="title" />
+                        <v-text-field
+                            label="Job Title"
+                            v-model.trim="title"
+                            type="text"
+                            :placeholder="userProfile.title"
+                            id="title"
+                        ></v-text-field>
 
-                        <button @click="updateProfile" class="button">Update Profile</button>
-                    </form>
-                </div>
-            </section>
-        </template>     
+                        <v-btn @click="updateProfile" color="primary" round dark class="button">Update Profile</v-btn>
+                    </v-form>
+                </v-flex>
+            </v-layout>
+        </v-container>            
     </div>  
 
 </template>

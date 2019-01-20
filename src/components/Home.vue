@@ -35,7 +35,7 @@
                         </v-list-tile-content>
                     </v-list-tile>
 
-                    <v-list-tile @click.prevent="userProfileMenu">
+                    <v-list-tile @click.prevent="">
                         <v-list-tile-action>
                             <v-icon>account_circle</v-icon>
                         </v-list-tile-action>
@@ -66,7 +66,7 @@
 
             <v-toolbar color="blue" dark fixed app>
                 <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-                <v-toolbar-title>Title</v-toolbar-title>
+                <v-toolbar-title>CariGeng</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-toolbar-items class="hidden-sm-and-down">
         <!--    <v-btn flat>Link One</v-btn>
