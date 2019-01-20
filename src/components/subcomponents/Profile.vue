@@ -1,49 +1,59 @@
 <template>
-    <div id="dashboard">
-        <section>
-            <div class="col1">
-                <div class="profile">
-                    <h5>{{ userProfile.name }}</h5>
-                    <p>{{ userProfile.title }}</p>
-                    <p>{{ currentUser.uid }}</p>
-                    <transition name="fade">
-                        <div v-if="hiddenPosts.length" @click="showNewPosts" class="hidden-posts">
-                            <p>
-                                Click to show <span class="new-posts">{{ hiddenPosts.length }}</span> 
-                                new <span v-if="hiddenPosts.length > 1">posts</span><span v-else>post</span>
-                            </p>
+    <div>
+        <v-container>
+            <!-- justify-content (horizontal), align-items (vertical) 
+                Note:cannot control xs6 sizes if use column layout -->
+            <v-layout justify-center row wrap>
+                <v-flex xs6 mb-4 >
+                        <div class="col2">
+                            <div>
+                                <p class="font-weight-black text-sm-center title">Name: {{ userProfile.name }}</p>
+                                <p class="font-weight-black text-sm-center title">Title: {{ userProfile.title }}</p>
+                                <div class="create-post">
+                                    <v-form @submit.prevent>
+                                        <v-text-field
+                                            label="Create a post"
+                                            v-model.trim="post.content"
+                                            type="text"
+                                        ></v-text-field>
+                                        <v-btn @click="createPost" color="primary" dark :disabled="post.content == ''">Post</v-btn>
+                                    </v-form>
+                                </div>
+                            </div>
                         </div>
-                    </transition>
-                    <div v-if="posts.length">
-                        <div v-for="post in posts" class="post">
-                            <h5>{{ post.userName }}</h5>
-                            <span>{{ post.createdOn | formatDate }}</span>
-                            <p>{{ post.content | trimLength }}</p>
-                            <ul>
-                                <li><a @click="openCommentModal(post)">comments {{ post.comments }}</a></li>
-                                <li><a @click="likePost(post.id, post.likes)">likes {{ post.likes }}</a></li>
-                                <li><a @click="viewPost(post)">view full post</a></li>
-                            </ul>
+                </v-flex>
+                <v-flex xs8>
+                    <div class="col1">
+                        <div class="profile">
+                            <transition name="fade">
+                                <div v-if="hiddenPosts.length" @click="showNewPosts" class="hidden-posts">
+                                    <p>
+                                        Click to show <span class="new-posts">{{ hiddenPosts.length }}</span> 
+                                        new <span v-if="hiddenPosts.length > 1">posts</span><span v-else>post</span>
+                                    </p>
+                                </div>
+                            </transition>
+                            <div v-if="posts.length">
+                                <div v-for="post in posts" class="post">
+                                    <h3>{{ post.userName }}</h3>
+                                    <span>{{ post.createdOn | formatDate }}</span>
+                                    <p>{{ post.content | trimLength }}</p>
+                                    <ul>
+                                        <li><a @click="openCommentModal(post)">comments {{ post.comments }}</a></li>
+                                        <li><a @click="likePost(post.id, post.likes)">likes {{ post.likes }}</a></li>
+                                        <li><a @click="viewPost(post)">view full post</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div v-else>
+                                <p class="no-results">There are currently no posts</p>
+                            </div>
                         </div>
                     </div>
-                    <div v-else>
-                        <p class="no-results">There are currently no posts</p>
-                    </div>
-                    <div class="create-post">
-                        <p>create a post</p>
-                        <form @submit.prevent>
-                            <textarea v-model.trim="post.content"></textarea>
-                            <button class="button" @click="createPost" :disabled="post.content == ''">post</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div class="col2">
-                <div>
-                    <p class="no-results">There are currently no posts</p>
-                </div>
-            </div>
-        </section>
+                </v-flex>
+                
+            </v-layout>
+        </v-container>   
         <!-- comment modal -->
         <transition name="fade">
             <div v-if="showCommentModal" class="c-modal">

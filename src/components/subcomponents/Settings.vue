@@ -2,13 +2,13 @@
     <div>
         <v-container>
             <v-layout justify-center align-center column fill-height>
-                <v-flex xs10>
+                <v-flex xs8 pr-2>
                     <h3 class="font-weight-black">Settings</h3>
                     <p class="font-weight-light">Update your profile</p>
 
                     <transition name="fade">
                         <v-alert
-                        :value="true"
+                        :value="showSuccess"
                         type="success"
                         style="max-height: 20px;"
                         outline
