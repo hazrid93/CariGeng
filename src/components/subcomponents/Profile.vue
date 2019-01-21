@@ -4,56 +4,76 @@
             <!-- justify-content (horizontal), align-items (vertical) 
                 Note:cannot control xs6 sizes if use column layout -->
             <v-layout justify-center row wrap>
-                <v-flex xs6 mb-4 >
-                        <div class="col2">
-                            <div>
-                                <p class="font-weight-black text-sm-center title">Name: {{ userProfile.name }}</p>
-                                <p class="font-weight-black text-sm-center title">Title: {{ userProfile.title }}</p>
-                                <div class="create-post">
-                                    <v-form @submit.prevent>
-                                        <v-text-field
-                                            label="Create a post"
-                                            v-model.trim="post.content"
-                                            type="text"
-                                        ></v-text-field>
-                                        <v-btn @click="createPost" color="primary" dark :disabled="post.content == ''">Post</v-btn>
-                                    </v-form>
-                                </div>
-                            </div>
-                        </div>
-                </v-flex>
-                <v-flex xs8>
-                    <div class="col1">
-                        <div class="profile">
-                            <transition name="fade">
-                                <div v-if="hiddenPosts.length" @click="showNewPosts" class="hidden-posts">
-                                    <p>
-                                        Click to show <span class="new-posts">{{ hiddenPosts.length }}</span> 
-                                        new <span v-if="hiddenPosts.length > 1">posts</span><span v-else>post</span>
-                                    </p>
-                                </div>
-                            </transition>
-                            <div v-if="posts.length">
-                                <div v-for="post in posts" class="post">
-                                    <h3>{{ post.userName }}</h3>
-                                    <span>{{ post.createdOn | formatDate }}</span>
-                                    <p>{{ post.content | trimLength }}</p>
-                                    <ul>
-                                        <li><a @click="openCommentModal(post)">comments {{ post.comments }}</a></li>
-                                        <li><a @click="likePost(post.id, post.likes)">likes {{ post.likes }}</a></li>
-                                        <li><a @click="viewPost(post)">view full post</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div v-else>
-                                <p class="no-results">There are currently no posts</p>
-                            </div>
+                <v-flex xs6 mb-4>
+                    <div>
+                        <p class="font-weight-black text-sm-center title">Name: {{ userProfile.name }}</p>
+                        <p class="font-weight-black text-sm-center title">Title: {{ userProfile.title }}</p>
+                        <div class="create-post">
+                            <v-form @submit.prevent>
+                                <v-text-field
+                                    label="Create a post"
+                                    v-model.trim="post.content"
+                                    type="text"
+                                ></v-text-field>
+                                <v-btn @click="createPost" color="primary" dark :disabled="post.content == ''">Post</v-btn>
+                            </v-form>
                         </div>
                     </div>
                 </v-flex>
-                
+
+                <!-- for comments section -->
+                <v-flex xs8 mb-4>
+                    <v-list two-line>
+                        <!--
+                            <v-subheader
+                                v-if="hiddenPosts.length" 
+                                @click="showNewPosts"
+                                :key="hiddenPosts.length"
+                            >
+                                <p>
+                                    Click to show <span>{{ hiddenPosts.length }}</span> 
+                                    new <span v-if="hiddenPosts.length > 1">posts</span><span v-else>post</span>
+                                </p>                                
+                            </v-subheader> -->
+                        <div v-if="posts.length">
+                            <template v-for="(post, index) in posts">
+
+                                <v-list-tile
+                                    :key="post.title"
+                                    avatar
+                                    ripple
+                                >   
+                                    
+                                    <v-list-tile-avatar>
+                                    <img :src="post.avatar">
+                                    </v-list-tile-avatar>
+                    
+                                    <v-list-tile-content>
+                                        <v-list-tile-title>{{ post.userName }}</v-list-tile-title>
+                                        <v-list-tile-sub-title>{{ post.content | trimLength }}</v-list-tile-sub-title>
+                                        <v-list-tile-sub-title ><a @click="openCommentModal(post)">comments {{ post.comments }}</a> <a @click="viewPost(post)">view full post</a></v-list-tile-sub-title>
+                                    </v-list-tile-content>
+                                    <v-list-tile-action>
+                                        <v-list-tile-action-text>{{ post.createdOn | formatDate }}</v-list-tile-action-text>
+                                        <v-list-tile-action-text>{{ post.likes }} likes</v-list-tile-action-text>
+                                        <v-icon v-if="selected.indexOf(index) < 0" @click="likePost(post.id, post.likes); toggle(index)" color="grey lighten-1">star_border</v-icon>
+                                        <v-icon v-else color="yellow darken-2">star</v-icon>
+                                    </v-list-tile-action>
+                                </v-list-tile>
+                                <v-divider
+                                    v-if="index + 1 < posts.length"
+                                    :key="index"
+                                ></v-divider>
+                            </template>
+                        </div>
+                        <div v-else>
+                            <p>There are currently no posts</p>
+                        </div>
+                    </v-list>
+                </v-flex>
             </v-layout>
         </v-container>   
+
         <!-- comment modal -->
         <transition name="fade">
             <div v-if="showCommentModal" class="c-modal">
@@ -115,7 +135,8 @@
                 showCommentModal: false,
                 showPostModal: false,
                 fullPost: {},
-                postComments: []
+                postComments: [],
+                selected: []
             }
         },
         computed: {
@@ -218,6 +239,15 @@
             closePostModal() {
                 this.postComments = []
                 this.showPostModal = false
+            },
+            toggle(index) {
+                const i = this.selected.indexOf(index)
+
+                if (i > -1) {
+                this.selected.splice(i, 1)
+                } else {
+                this.selected.push(index)
+                }
             }
         },
         filters: {
