@@ -41,11 +41,25 @@ fb.auth.onAuthStateChanged(user => {
                 let post = doc.data()
                 post.id = doc.id
                 postsArray.push(post)
-                console.log(post)
+            
             })
 
             store.commit('setPosts', postsArray)
         }
+    })
+
+    //realtime update for events
+    fb.eventsCollection.orderBy('createdOn', 'desc').onSnapshot(querySnapshot => {
+      let eventsArray = []
+
+      querySnapshot.forEach(doc => {
+          let post = doc.data()
+          post.id = doc.id
+          eventsArray.push(post)
+      
+      })
+
+      store.commit('setEvents', eventsArray)
     })
   }
 })
@@ -56,7 +70,8 @@ export const store =  new Vuex.Store({
         currentUser: null,
         userProfile: {},
         posts: [],
-        hiddenPosts: []
+        hiddenPosts: [],
+        events: []
 
     },
     //mutations are synhcronous
@@ -82,7 +97,10 @@ export const store =  new Vuex.Store({
           } else {
               state.hiddenPosts = []
           }
-        }
+        },
+        setEvents(state, val) {
+          state.events = val
+        },
     },
     //actions are asynchronous
     actions: {

@@ -4,24 +4,8 @@
             <!-- justify-content (horizontal), align-items (vertical) 
                 Note:cannot control xs6 sizes if use column layout -->
             <v-layout justify-center row wrap>
-                <v-flex xs6 mb-4>
-                    <div>
-                        <p class="font-weight-black text-sm-center title">Name: {{ userProfile.name }}</p>
-                        <p class="font-weight-black text-sm-center title">Title: {{ userProfile.title }}</p>
-                        <div class="create-post">
-                            <v-form @submit.prevent>
-                                <v-text-field
-                                    label="Create a post"
-                                    v-model.trim="post.content"
-                                    type="text"
-                                ></v-text-field>
-                                <v-btn @click="createPost" color="primary" dark :disabled="post.content == ''">Post</v-btn>
-                            </v-form>
-                        </div>
-                    </div>
-                </v-flex>
 
-                <!-- for comments section -->
+                <!-- for events section -->
                 <v-flex xs12 mb-4>
                     <v-list two-line>
                         <!--
@@ -73,44 +57,6 @@
                 </v-flex>
             </v-layout>
         </v-container>   
-
-        <!-- comment modal -->
-        <transition name="fade">
-            <div v-if="showCommentModal" class="c-modal">
-                <div class="c-container">
-                    <a @click="closeCommentModal">X</a>
-                    <p>add a comment</p>
-                    <form @submit.prevent>
-                        <textarea v-model.trim="comment.content"></textarea>
-                        <button @click="addComment" :disabled="comment.content == ''" class="button">add comment</button>
-                    </form>
-                </div>
-            </div>
-        </transition>
-        <!-- post modal -->
-        <transition name="fade">
-            <div v-if="showPostModal" class="p-modal">
-                <div class="p-container">
-                    <a @click="closePostModal" class="close">X</a>
-                    <div class="post">
-                        <h5>{{ fullPost.userName }}</h5>
-                        <span>{{ fullPost.createdOn | formatDate }}</span>
-                        <p>{{ fullPost.content }}</p>
-                        <ul>
-                            <li><a>comments {{ fullPost.comments }}</a></li>
-                            <li><a>likes {{ fullPost.likes }}</a></li>
-                        </ul>
-                    </div>
-                    <div v-show="postComments.length" class="comments">
-                        <div v-for="comment in postComments" class="comment">
-                            <p>{{ comment.userName }}</p>
-                            <span>{{ comment.createdOn | formatDate }}</span>
-                            <p>{{ comment.content }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </transition>
     </div>
 
 </template>

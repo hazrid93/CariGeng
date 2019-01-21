@@ -27,7 +27,7 @@
                         ></v-text-field>
 
                         <v-text-field
-                            label="Job Title"
+                            label="Title"
                             v-model.trim="title"
                             type="text"
                             :placeholder="userProfile.title"

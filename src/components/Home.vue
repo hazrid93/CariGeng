@@ -37,6 +37,15 @@
 
                     <v-list-tile @click.prevent="">
                         <v-list-tile-action>
+                            <v-icon>bubble_chart</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-content>
+                            <v-list-tile-title><router-link to="/home/events" tag="li" active-class="active" exact>Events</router-link></v-list-tile-title>
+                        </v-list-tile-content>
+                    </v-list-tile>
+
+                    <v-list-tile @click.prevent="">
+                        <v-list-tile-action>
                             <v-icon>account_circle</v-icon>
                         </v-list-tile-action>
                         <v-list-tile-content>
