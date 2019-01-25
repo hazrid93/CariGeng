@@ -7,100 +7,42 @@
                 <v-flex xs10 sm10 md4 :class="{'pb-4': paddingBottom, 'pr-4': paddingRight}">
                     <v-layout row justify-center>
                         <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
-                        <v-btn class="ma-0" slot="activator" color="primary" dark>Open Dialog</v-btn>
+                        <v-btn class="ma-0" slot="activator" color="primary" dark>Create Event</v-btn>
                         
                         <v-card>
                             <v-toolbar dark color="primary">
                                 <v-btn icon dark @click="dialog = false">
                                     <v-icon>close</v-icon>
                                 </v-btn>
-                            <v-toolbar-title>Add Event</v-toolbar-title>
+                            <v-toolbar-title>Create Event</v-toolbar-title>
                             <v-spacer></v-spacer>
                             <v-toolbar-items>
-                                <v-btn dark flat @click="createEvent; dialog = false">Send</v-btn>
+                                <v-btn dark flat @click="createEvent(); dialog = false">Send</v-btn>
                             </v-toolbar-items>
                             </v-toolbar>
                             <!--event form section-->
                             <v-layout justify-center>
                                 <v-flex xs10>
                                     <v-form ref="form" lazy-validation>
-                                        <v-text-field v-model="Title" label="Title" required ></v-text-field>
-                                        <v-text-field v-model="About" label="About" required ></v-text-field>
-                                        <v-text-field v-model="Address" label="Address" required ></v-text-field>
-                                        <v-text-field v-model="City" label="City" required ></v-text-field>
-                                        <v-text-field v-model="State" label="City" required ></v-text-field>
-                                        <v-text-field v-model="Country" label="Country" required ></v-text-field>
-                                        <v-btn :disabled="!valid" color="success" @click="validate" > Validate </v-btn>
+                                        
+                                        <v-text-field v-model="event.title" label="Title" required ></v-text-field>
+                                        <v-text-field v-model="event.content" label="Content" required ></v-text-field>
+                                        <v-text-field v-model="event.address" label="Address" required ></v-text-field>
+                                        <v-text-field v-model="event.city" label="City" required ></v-text-field>
+                                        <v-text-field v-model="event.state" label="State" required ></v-text-field>
+                                        <v-text-field v-model="event.country" label="Country" required ></v-text-field>
+
                                     </v-form>
                                 </v-flex>
                             </v-layout>
                         </v-card>
-                       
-                      <!--  <v-card>
-                            <v-toolbar dark color="primary">
-                            <v-btn icon dark @click="dialog = false">
-                                <v-icon>close</v-icon>
-                            </v-btn>
-                            <v-toolbar-title>Add Event</v-toolbar-title>
-                            <v-spacer></v-spacer>
-                            <v-toolbar-items>
-                                <v-btn dark flat @click="createEvent; dialog = false">Send</v-btn>
-                            </v-toolbar-items>
-                            </v-toolbar>
-                            <v-list three-line subheader>
-                            <v-subheader>Add your event</v-subheader>
-                            <v-list-tile avatar>
-                                <v-list-tile-content>
-                                <v-list-tile-title>Content filtering</v-list-tile-title>
-                                <v-list-tile-sub-title>Set the content filtering level to restrict apps that can be downloaded</v-list-tile-sub-title>
-                                </v-list-tile-content>
-                            </v-list-tile>
-                            <v-list-tile avatar>
-                                <v-list-tile-content>
-                                <v-list-tile-title>Password</v-list-tile-title>
-                                <v-list-tile-sub-title>Require password for purchase or use password to restrict purchase</v-list-tile-sub-title>
-                                </v-list-tile-content>
-                            </v-list-tile>
-                            </v-list>
-                            <v-divider></v-divider>
-                            <v-list three-line subheader>
-                            <v-subheader>General</v-subheader>
-                            <v-list-tile avatar>
-                                <v-list-tile-action>
-                                <v-checkbox v-model="notifications"></v-checkbox>
-                                </v-list-tile-action>
-                                <v-list-tile-content>
-                                <v-list-tile-title>Notifications</v-list-tile-title>
-                                <v-list-tile-sub-title>Notify me about updates to apps or games that I downloaded</v-list-tile-sub-title>
-                                </v-list-tile-content>
-                            </v-list-tile>
-                            <v-list-tile avatar>
-                                <v-list-tile-action>
-                                <v-checkbox v-model="sound"></v-checkbox>
-                                </v-list-tile-action>
-                                <v-list-tile-content>
-                                <v-list-tile-title>Sound</v-list-tile-title>
-                                <v-list-tile-sub-title>Auto-update apps at any time. Data charges may apply</v-list-tile-sub-title>
-                                </v-list-tile-content>
-                            </v-list-tile>
-                            <v-list-tile avatar>
-                                <v-list-tile-action>
-                                <v-checkbox v-model="widgets"></v-checkbox>
-                                </v-list-tile-action>
-                                <v-list-tile-content>
-                                <v-list-tile-title>Auto-add widgets</v-list-tile-title>
-                                <v-list-tile-sub-title>Automatically add home screen widgets</v-list-tile-sub-title>
-                                </v-list-tile-content>
-                            </v-list-tile>
-                            </v-list>
-                        </v-card> -->
                         </v-dialog>
                     </v-layout>
                 </v-flex>
                 <v-flex xs10 sm10 md8>
                     <div v-if="events.length">
                         <template v-for="(event, index) in events">
-                            <v-card :key="event.title" mb-3>
+                            <v-card :key="event.title" class="mb-4">
                                 <v-img
                                 src="https://cdn.vuetifyjs.com/images/cards/house.jpg"
                                 height="200px"
@@ -109,8 +51,8 @@
                                     fill-height
                                     fluid
                                 >
-                                    <v-layout fill-height>
-                                    <v-flex xs12 align-end flexbox>
+                                    <v-layout fill-height align-start>
+                                    <v-flex xs12 flexbox>
                                         <span class="headline white--text" v-text="event.title"></span>
                                     </v-flex>
                                     </v-layout>
@@ -151,7 +93,12 @@
         data() {
             return { 
                 event: {
-
+                    title: '',
+                    about: '',
+                    address: '',
+                    city: '',
+                    state: '',
+                    country: ''
                 },
                 dialog: false,
                 notifications: false,
@@ -182,6 +129,25 @@
                     this.paddingRight = true
                 }
                 
+            },
+            createEvent() {
+                console.log("create event called")
+                fb.eventsCollection.add({
+                    createdOn: new Date(),
+                    title: this.event.title,
+                    userId: this.currentUser.uid,
+                    userName: this.userProfile.name,
+                    address: this.event.address,
+                    content: this.event.content,
+                    city: this.event.city,
+                    state: this.event.state,
+                    country: this.event.country
+
+                }).then(ref => {
+                    
+                }).catch(err => {
+                    console.log(err)
+                })
             }
         },
         filters: {

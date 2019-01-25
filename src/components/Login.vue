@@ -7,9 +7,8 @@
         </transition>
         <section>
             <div class="col1">
-                <h1>Vuegram</h1>
-                <p>Welcome to the <a href="https://savvyapps.com/" target="_blank">Savvy Apps</a> sample social media web app powered by Vue.js and Firebase.
-                    Build this project by checking out The Definitive Guide to Getting Started with Vue.js</p>
+                <h1>CariGeng</h1>
+                <p>Welcome to CariGeng</p>
             </div>
             <div class="col2" :class="{ 'signup-form': !showLoginForm && !showForgotPassword }">
                 <form v-if="showLoginForm" @submit.prevent>
@@ -128,7 +127,7 @@
                    this.$store.commit('setCurrentUser', user.user)
                    this.$store.dispatch('fetchUserProfile')
                     this.performingRequest = false
-                    this.$router.push('/dashboard')
+                    this.$router.push('/home')
                     
                 }).catch(err => {
                     console.log(err)
@@ -147,7 +146,7 @@
                     }).then(() => {
                         this.$store.dispatch('fetchUserProfile')
                         this.performingRequest = false;
-                        this.$router.push('/dashboard')
+                        this.$router.push('/home')
                     }).catch(err => {
                         console.log(err)
                         this.performingRequest = false;
