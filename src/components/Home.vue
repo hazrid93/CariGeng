@@ -143,6 +143,17 @@
                 return this.$store.getters.getCurrentUser
             }
         },
+        filters: {
+            formatDate(val) {
+                if (!val) { return '-' }
+                let date = val.toDate()
+                return moment(date).fromNow()
+            },
+            trimLength(val) {
+                if (val.length < 200) { return val }
+                return `${val.substring(0, 200)}...`
+            }
+        },
         created: function(){
            // console.log("hello");
         },

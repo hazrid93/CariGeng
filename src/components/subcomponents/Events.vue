@@ -8,19 +8,47 @@
                     <v-layout row justify-center>
                         <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
                         <v-btn class="ma-0" slot="activator" color="primary" dark>Open Dialog</v-btn>
+                        
                         <v-card>
+                            <v-toolbar dark color="primary">
+                                <v-btn icon dark @click="dialog = false">
+                                    <v-icon>close</v-icon>
+                                </v-btn>
+                            <v-toolbar-title>Add Event</v-toolbar-title>
+                            <v-spacer></v-spacer>
+                            <v-toolbar-items>
+                                <v-btn dark flat @click="createEvent; dialog = false">Send</v-btn>
+                            </v-toolbar-items>
+                            </v-toolbar>
+                            <!--event form section-->
+                            <v-layout justify-center>
+                                <v-flex xs10>
+                                    <v-form ref="form" lazy-validation>
+                                        <v-text-field v-model="Title" label="Title" required ></v-text-field>
+                                        <v-text-field v-model="About" label="About" required ></v-text-field>
+                                        <v-text-field v-model="Address" label="Address" required ></v-text-field>
+                                        <v-text-field v-model="City" label="City" required ></v-text-field>
+                                        <v-text-field v-model="State" label="City" required ></v-text-field>
+                                        <v-text-field v-model="Country" label="Country" required ></v-text-field>
+                                        <v-btn :disabled="!valid" color="success" @click="validate" > Validate </v-btn>
+                                    </v-form>
+                                </v-flex>
+                            </v-layout>
+                        </v-card>
+                       
+                      <!--  <v-card>
                             <v-toolbar dark color="primary">
                             <v-btn icon dark @click="dialog = false">
                                 <v-icon>close</v-icon>
                             </v-btn>
-                            <v-toolbar-title>Settings</v-toolbar-title>
+                            <v-toolbar-title>Add Event</v-toolbar-title>
                             <v-spacer></v-spacer>
                             <v-toolbar-items>
-                                <v-btn dark flat @click="dialog = false">Save</v-btn>
+                                <v-btn dark flat @click="createEvent; dialog = false">Send</v-btn>
                             </v-toolbar-items>
                             </v-toolbar>
                             <v-list three-line subheader>
-                            <v-subheader>User Controls</v-subheader>
+                            <v-subheader>Add your event</v-subheader>
                             <v-list-tile avatar>
                                 <v-list-tile-content>
                                 <v-list-tile-title>Content filtering</v-list-tile-title>
@@ -65,7 +93,7 @@
                                 </v-list-tile-content>
                             </v-list-tile>
                             </v-list>
-                        </v-card>
+                        </v-card> -->
                         </v-dialog>
                     </v-layout>
                 </v-flex>
@@ -108,42 +136,6 @@
                         <p>There are currently no event</p>
                     </div>
                 </v-flex>
-                <!-- for events section -->
-                <!--
-                <v-flex xs12 mb-4>
-                    <v-list two-line>
-
-                        <div v-if="events.length">
-                            <template v-for="(event, index) in events">
-
-                                <v-list-tile
-                                    :key="event.title"
-                                    avatar
-                                    ripple
-                                >   
-
-                                    <v-list-tile-content>
-                                        <v-list-tile-title>{{ event.userName }}</v-list-tile-title>
-                                        <v-list-tile-sub-title>{{ event.content | trimLength }}</v-list-tile-sub-title>
-                
-                                    </v-list-tile-content>
-                                    <v-list-tile-action>
-                                        <v-list-tile-action-text>{{ event.createdOn | formatDate }}</v-list-tile-action-text>
-                                        <v-list-tile-action-text>{{ event.eventLikes }} likes</v-list-tile-action-text>
-                                    </v-list-tile-action>
-                                </v-list-tile>
-                                <v-divider
-                                    v-if="index + 1 < event.length"
-                                    :key="index"
-                                ></v-divider>
-                            </template>
-                        </div>
-                        <div v-else>
-                            <p>There are currently no event</p>
-                        </div>
-                    </v-list>
-                </v-flex>
-                -->
             </v-layout>
         </v-container>   
     </div>
@@ -158,6 +150,9 @@
     export default {
         data() {
             return { 
+                event: {
+
+                },
                 dialog: false,
                 notifications: false,
                 sound: true,
