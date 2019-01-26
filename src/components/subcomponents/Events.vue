@@ -8,7 +8,7 @@
                         <v-layout justify-center>
                             <v-dialog v-model="dialogPostEvent" fullscreen hide-overlay transition="dialog-bottom-transition">
                                 <v-btn round outline class="ma-0 text-md-center" slot="activator" color="primary" dark>Create Event</v-btn>
-                                <v-card height="100%" min-height="100%">
+                                <v-card>
                                     <v-toolbar dark color="black">
                                         <v-btn icon dark @click="dialogPostEvent = false">
                                             <v-icon>close</v-icon>
@@ -20,8 +20,8 @@
                                     </v-toolbar-items>
                                     </v-toolbar>
                                     <!--event form section-->  
-                                    <div class="text-xs-center" style="height: 90%;">
-                                        <v-layout align-center justify-center row wrap style="height: inherit;">
+                                   
+                                        <v-layout mt-4 justify-center row wrap style="height: inherit;">
                                             <v-flex xs10 sm10 md8>
                                                 <v-form ref="form" lazy-validation>    
                                                     <v-text-field v-model.trim="event.title" label="Title" required ></v-text-field>
@@ -35,14 +35,14 @@
                                                 </v-form>
                                             </v-flex>
                                         </v-layout>
-                                    </div>
+                                  
                                 </v-card>
                             </v-dialog>
                         </v-layout>
                     </v-flex>
                     <v-flex xs12 sm12 md8>
                        <!-- event details when clicked -->
-                        <v-dialog v-model="dialogEvent" scrollable max-width="80%" max-height="80%">
+                        <v-dialog v-model="dialogEvent" scrollable max-width="100%" max-height="100%">
                             <v-card>
                                 <v-card-title>Event Details</v-card-title>
                                 <v-divider></v-divider>
