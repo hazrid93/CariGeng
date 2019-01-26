@@ -2,6 +2,7 @@
         <v-container fluid fill-height>
             <!-- justify-content (vertical), align-items (horizontal) 
                 Note:cannot control xs6 sizes if use column layout -->
+                <!-- <div ref="mapaa" style="height: 400px; width: 700px;"></div> -->
                 <v-layout justify-center row wrap>
                     <v-flex xs10 sm10 md4 :class="{'pb-4': paddingBottom, 'pr-4': paddingRight}">
                         <v-layout justify-center>
@@ -23,12 +24,14 @@
                                         <v-layout align-center justify-center row wrap style="height: inherit;">
                                             <v-flex xs10 sm10 md8>
                                                 <v-form ref="form" lazy-validation>    
-                                                    <v-text-field v-model="event.title" label="Title" required ></v-text-field>
-                                                    <v-text-field v-model="event.content" label="Content" required ></v-text-field>
-                                                    <v-text-field v-model="event.address" label="Address" required ></v-text-field>
-                                                    <v-text-field v-model="event.city" label="City" required ></v-text-field>
-                                                    <v-text-field v-model="event.state" label="State" required ></v-text-field>
-                                                    <v-text-field v-model="event.country" label="Country" required ></v-text-field>
+                                                    <v-text-field v-model.trim="event.title" label="Title" required ></v-text-field>
+                                                    <v-text-field v-model.trim="event.content" label="Content" required ></v-text-field>
+                                                    <v-text-field v-model.trim="event.address" label="Address" required ></v-text-field>
+                                                    <v-text-field v-model.trim="event.city" label="City" required ></v-text-field>
+                                                    <v-text-field v-model.trim="event.state" label="State" required ></v-text-field>
+                                                    <v-text-field v-model.trim="event.country" label="Country" required ></v-text-field>
+                                                    <v-text-field v-model="event.latitude" type="number" label="Latitude" required ></v-text-field>
+                                                    <v-text-field v-model="event.longitude" type="number" label="Longitude" required ></v-text-field>
                                                 </v-form>
                                             </v-flex>
                                         </v-layout>
@@ -38,6 +41,35 @@
                         </v-layout>
                     </v-flex>
                     <v-flex xs10 sm10 md8>
+                       <!-- event details when clicked -->
+                        <v-dialog v-model="dialogEvent" scrollable max-width="80%" max-height="80%">
+                            <v-card>
+                                <v-card-title>Event Details</v-card-title>
+                                <v-divider></v-divider>
+                                
+                                <v-card-text>
+                                    <h3 style="text-decoration: underline">Title</h3>
+                                    <p>{{ currentEvent.title }}</p>
+
+                                    <h3 style="text-decoration: underline">Information</h3>
+                                    <p>{{ currentEvent.content }}</p>
+                           
+                                    <h3 style="text-decoration: underline">Created By</h3>
+                                    <p>{{ currentEvent.userName }}</p>
+
+                  
+                                    <h3 style="text-decoration: underline">Location</h3>
+                                    <div v-if="mapBoolean" ref="mapCanvas" style="height: 350px; width: 100%;"></div>
+                                    <div v-else style="height: 350px; width: 100%;"><p>No location specified for this event</p></div>
+                                </v-card-text>
+                                
+                                <v-divider></v-divider>
+                                <v-card-actions>
+                                <v-btn color="blue darken-1" flat @click="dialogEvent = false">Close</v-btn>
+                                </v-card-actions>
+                            </v-card>
+                        </v-dialog>
+
                         <div v-if="events.length">
                             <template v-for="(event, index) in events">
                                 <v-card :key="event.title" class="mb-4">
@@ -50,24 +82,9 @@
                                         </v-layout>
                                     </v-container>
                                     </v-img>
-
+                                   
                                     <v-card-actions>
                                         <v-card-title primary-title>
-                                            <!-- event details when clicked -->
-                                            <v-dialog v-model="dialogEvent" scrollable max-width="80%">
-                                                <v-card>
-                                                    <v-card-title>Event Details</v-card-title>
-                                                    <v-divider></v-divider>
-                                                    <v-card-text style="height: 80%;">
-                                                        
-                                                    </v-card-text>
-                                                    <v-divider></v-divider>
-                                                    <v-card-actions>
-                                                    <v-btn color="blue darken-1" flat @click="dialogEvent = false">Close</v-btn>
-                                                    </v-card-actions>
-                                                </v-card>
-                                            </v-dialog>
-
                                             <div>
                                                 <div class="headline"><a style="text-decoration: none; color: inherit;" @click="expandEvent(event); dialogEvent = true">{{ event.title | trimCardText }}</a></div>
                                                 <span class="grey--text">{{ event.createdOn | formatDate }}</span>
@@ -99,6 +116,7 @@
                     </v-flex>
                 </v-layout>
         </v-container>   
+       
 </template>
 
 <script>
@@ -115,7 +133,9 @@
                     address: '',
                     city: '',
                     state: '',
-                    country: ''
+                    country: '',
+                    latitude: 0.0,
+                    longitude: 0.0
                 },
                 dialogPostEvent: false,
                 dialogEvent: false,
@@ -123,7 +143,11 @@
                 sound: true,
                 widgets: false,
                 paddingBottom: false,
-                paddingRight: false
+                paddingRight: false,
+                currentEvent: {},
+                map: {},
+                mapMarker: {},
+                mapBoolean: true
             }
                 
         },
@@ -157,7 +181,9 @@
                     content: this.event.content,
                     city: this.event.city,
                     state: this.event.state,
-                    country: this.event.country
+                    country: this.event.country,
+                    latitude: parseFloat(this.event.latitude),
+                    longitude: parseFloat(this.event.longitude)
 
                 }).then(ref => {
                     
@@ -167,6 +193,7 @@
             },
             likeEvent(event){
                 let docId = `${this.currentUser.uid}_${event.id}`
+                
                 //search based on this id (docId)
                 fb.eventslikesCollection.doc(docId).get().then(doc => {
                     //this part make sure same user doesnt like twice
@@ -187,10 +214,33 @@
                 })
             },
             expandEvent(event){
-                fb.eventsCollection.doc(event.id).get().then(doc => {
-                    console.log(event.content)
-                })
+                this.currentEvent = event
+
+                var latitudeval = this.currentEvent.latitude;
+                var longitudeval = this.currentEvent.longitude;
+                
+                if(latitudeval != null && longitudeval != null){
+                    this.mapBoolean = true
+                    //console.log("true")
+                } else {
+                     this.mapBoolean = false
+                     //console.log("false")
+                     return
+                }
+                
+                this.map = new google.maps.Map(this.$refs.mapCanvas, {
+                    zoom: 19,
+                    center: new google.maps.LatLng(latitudeval,longitudeval)
+                });
+                
+                this.mapMarker = new google.maps.Marker({
+                    position: new google.maps.LatLng(latitudeval,longitudeval),
+                    map: this.map,
+                    title: 'We are here!'
+                });
             }
+
+                 
         },
         filters: {
             formatDate(val) {
