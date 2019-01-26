@@ -37,12 +37,7 @@
                             </v-subheader> -->
                         <div v-if="posts.length">
                             <template v-for="(post, index) in posts">
-
-                                <v-list-tile
-                                    :key="post.title"
-                                    avatar
-                                    ripple
-                                >   
+                                <v-list-tile :key="post.title" avatar ripple >   
                                     
                                     <v-list-tile-avatar>
                                     <img :src="post.avatar">

@@ -29,7 +29,7 @@ const postsCollection = db.collection('posts')
 const commentsCollection = db.collection('comments')
 const likesCollection = db.collection('likes')
 const eventsCollection = db.collection('events')
-
+const eventslikesCollection = db.collection('events_likes')
 
 export {
     db,
@@ -39,5 +39,6 @@ export {
     postsCollection,
     commentsCollection,
     likesCollection,
-    eventsCollection
+    eventsCollection,
+    eventslikesCollection
 }

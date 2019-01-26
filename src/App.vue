@@ -1,11 +1,11 @@
 <template>
   <div id="app">
     <v-app>
-      <main style="height: 100%;">
+      <v-content style="height: 100%; padding: 0;">
         <keep-alive>
           <router-view/>
         </keep-alive>
-      </main>
+      </v-content>
     </v-app> 
   </div>
 </template>
