@@ -74,7 +74,7 @@
                 </v-list>
             </v-navigation-drawer>
 
-            <v-toolbar color="blue" dark fixed app>
+            <v-toolbar color="black" dark fixed app>
                 <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
                 <v-toolbar-title>CariGeng</v-toolbar-title>
                 <v-spacer></v-spacer>
@@ -88,7 +88,7 @@
                <!-- <p>{{ currentUser }}</p> -->
                 <router-view/>
             </v-content>
-            <v-footer color="blue" app>
+            <v-footer color="black" app>
             <span class="white--text">&copy; 2017</span>
             </v-footer>
         </div>

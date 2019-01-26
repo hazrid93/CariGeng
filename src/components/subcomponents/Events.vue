@@ -5,17 +5,17 @@
                 <v-layout justify-center row wrap>
                     <v-flex xs10 sm10 md4 :class="{'pb-4': paddingBottom, 'pr-4': paddingRight}">
                         <v-layout justify-center>
-                            <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+                            <v-dialog v-model="dialogPostEvent" fullscreen hide-overlay transition="dialog-bottom-transition">
                                 <v-btn round outline class="ma-0 text-md-center" slot="activator" color="primary" dark>Create Event</v-btn>
                                 <v-card height="100%" min-height="100%">
-                                    <v-toolbar dark color="primary">
-                                        <v-btn icon dark @click="dialog = false">
+                                    <v-toolbar dark color="black">
+                                        <v-btn icon dark @click="dialogPostEvent = false">
                                             <v-icon>close</v-icon>
                                         </v-btn>
                                     <v-toolbar-title>Create Event</v-toolbar-title>
                                     <v-spacer></v-spacer>
                                     <v-toolbar-items>
-                                        <v-btn dark flat @click="createEvent(); dialog = false">Send</v-btn>
+                                        <v-btn dark flat @click="createEvent(); dialogPostEvent = false">Send</v-btn>
                                     </v-toolbar-items>
                                     </v-toolbar>
                                     <!--event form section-->  
@@ -53,10 +53,26 @@
 
                                     <v-card-actions>
                                         <v-card-title primary-title>
+                                            <!-- event details when clicked -->
+                                            <v-dialog v-model="dialogEvent" scrollable max-width="80%">
+                                                <v-card>
+                                                    <v-card-title>Event Details</v-card-title>
+                                                    <v-divider></v-divider>
+                                                    <v-card-text style="height: 80%;">
+                                                        
+                                                    </v-card-text>
+                                                    <v-divider></v-divider>
+                                                    <v-card-actions>
+                                                    <v-btn color="blue darken-1" flat @click="dialogEvent = false">Close</v-btn>
+                                                    </v-card-actions>
+                                                </v-card>
+                                            </v-dialog>
+
                                             <div>
-                                                <div class="headline">{{ event.title | trimCardText }}</div>
+                                                <div class="headline"><a style="text-decoration: none; color: inherit;" @click="expandEvent(event); dialogEvent = true">{{ event.title | trimCardText }}</a></div>
                                                 <span class="grey--text">{{ event.createdOn | formatDate }}</span>
                                             </div>
+
                                         </v-card-title>
                                         <v-spacer></v-spacer>
                                         <v-list-tile-content>
@@ -70,6 +86,9 @@
                                         <v-btn icon>
                                             <v-icon>bookmark</v-icon>
                                         </v-btn>
+
+                                       
+
                                     </v-card-actions>
                                 </v-card>
                             </template>
@@ -98,7 +117,8 @@
                     state: '',
                     country: ''
                 },
-                dialog: false,
+                dialogPostEvent: false,
+                dialogEvent: false,
                 notifications: false,
                 sound: true,
                 widgets: false,
@@ -165,21 +185,11 @@
                 }).catch(err => {
                     console.log(err)
                 })
-                           
-                /*
-                console.log("like event called: " + event.id)
-                let docId = `${this.currentUser.uid}`
-                fb.eventslikesCollection.doc(docId).get().
-                then(doc =>{ 
-                    console.log(doc)
-                    doc.forEach(doc => {
-                        
-                    })
-                }).catch(err => {
-                    console.log(err)
+            },
+            expandEvent(event){
+                fb.eventsCollection.doc(event.id).get().then(doc => {
+                    console.log(event.content)
                 })
-                */
-    
             }
         },
         filters: {

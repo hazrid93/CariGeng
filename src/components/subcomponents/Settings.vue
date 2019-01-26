@@ -34,7 +34,7 @@
                             id="title"
                         ></v-text-field>
 
-                        <v-btn @click="updateProfile" color="primary" round dark class="button">Update Profile</v-btn>
+                        <v-btn round outline @click="updateProfile" color="primary" round dark class="button">Update Profile</v-btn>
                     </v-form>
                 </v-flex>
             </v-layout>
