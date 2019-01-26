@@ -5,7 +5,8 @@
                     
                         <transition name="fade">
                             <div v-if="performingRequest" class="loading">
-                                <h3 style="text-align: center;">Loading...</h3>
+                                <h3 style="text-align: center; padding-bottom: 10px;">Loading...</h3>
+
                             </div>
                         </transition>
                    
@@ -32,7 +33,7 @@
 
                             <v-form v-if="showLoginForm" @submit.prevent>
                                 <v-layout justify-center align-center row wrap>
-                                    <v-flex xs8 text-xs-center>
+                                    <v-flex xs8 md5 text-xs-center>
                                         <v-text-field placeholder="email" clearable outline v-model.trim="loginForm.email" label="Email" id="email1" required ></v-text-field>
                                         <v-text-field placeholder="password" clearable outline v-model.trim="loginForm.password" label="Password" id="password1" type="password" required ></v-text-field>
                                         <v-btn @click="login">Log In</v-btn>
@@ -46,49 +47,47 @@
                                 </v-layout>
                             </v-form>
                             <v-form v-if="!showLoginForm && !showForgotPassword" @submit.prevent>
-                                <h1>Get Started</h1>
+                                <v-layout justify-center align-center row wrap>
+                                    <v-flex xs8 md5 text-xs-center>
+                                    <h3>Get Started</h3>
 
-                                <label for="name">Name</label>
-                                <input v-model.trim="signupForm.name" type="text" placeholder="Savvy Apps" id="name" />
-
-                                <label for="title">Title</label>
-                                <input v-model.trim="signupForm.title" type="text" placeholder="Company" id="title" />
-
-                                <label for="email2">Email</label>
-                                <input v-model.trim="signupForm.email" type="text" placeholder="you@email.com" id="email2" />
-
-                                <label for="password2">Password</label>
-                                <input v-model.trim="signupForm.password" type="password" placeholder="min 6 characters" id="password2" />
-
-                                <button @click="signup" class="button">Sign Up</button>
-
-                                <div class="extras">
-                                    <a @click="toggleForm">Back to Log In</a>
-                                </div>
-                            </v-form>
-                            <v-form v-if="showForgotPassword" @submit.prevent class="password-reset">
-                                <div v-if="!passwordResetSuccess">
-                                    <h1>Reset Password</h1>
-                                    <p>We will send you an email to reset your password</p>
-
-                                    <label for="email3">Email</label>
-                                    <input v-model.trim="passwordForm.email" type="text" placeholder="you@email.com" id="email3"/>
-
-                                    <button @click="resetPassword" class="button">Submit</button>
-
+                                    <v-text-field placeholder="Name" clearable outline v-model.trim="signupForm.name" label="Name" id="name" required ></v-text-field>
+                                    <v-text-field placeholder="Title" clearable outline v-model.trim="signupForm.title" label="Title" id="title" required ></v-text-field>
+                                    <v-text-field placeholder="Email" clearable outline v-model.trim="signupForm.email" label="Email" id="email2" required ></v-text-field>
+                                    <v-text-field placeholder="Min 6 characters" clearable outline v-model.trim="signupForm.password" type="password" label="Password" id="password2" required ></v-text-field>
+                                    <v-btn @click="signup">Sign Up</v-btn>
+  
                                     <div class="extras">
-                                        <a @click="togglePasswordReset">Back to Log In</a>
+                                        <a @click="toggleForm" style="padding: 5px">Back to Log In</a>
                                     </div>
-                                </div>
-                                <div v-else>
-                                    <h1>Email Sent</h1>
-                                    <p>Check your email for a link to reset your password</p>
-                                    <button @click="togglePasswordReset">Back to Log in</button>
-                                </div>
+                                    </v-flex>
+                                </v-layout>
+                            </v-form>
+                            <!-- forgot password part -->
+                            <v-form v-if="showForgotPassword" @submit.prevent class="password-reset">
+                                 <v-layout justify-center align-center row wrap>
+                                    <v-flex xs8 md5 text-xs-center>
+                                    <div v-if="!passwordResetSuccess">
+                                        <h3>Reset Password</h3>
+                                        <p>We will send you an email to reset your password</p>
+                                        <v-text-field placeholder="email" clearable outline v-model.trim="passwordForm.email" label="Email" id="email3" required ></v-text-field>
+                                        <v-btn @click="resetPassword">Submit</v-btn>
+
+                                        <div class="extras">
+                                            <a @click="togglePasswordReset" style="padding: 5px">Back to Log In</a>
+                                        </div>
+                                    </div>
+                                    <div v-else>
+                                        <h3>Email Sent</h3>
+                                        <p>Check your email for a link to reset your password</p>
+                                        <button @click="togglePasswordReset" style="padding: 5px">Back to Log in</button>
+                                    </div>
+                                    </v-flex>
+                                 </v-layout>
                             </v-form>
                             <transition name="fade">
                                 <div v-if="errorMsg !== ''" class="error-msg">
-                                    <p>{{ errorMsg }}</p>
+                                    <p style="text-align: center;">{{ errorMsg }}</p>
                                 </div>
                             </transition>
                         </div>    
@@ -135,6 +134,7 @@
                     this.showLoginForm = true
                     this.showForgotPassword = false
                     this.passwordResetSuccess = false
+                    this.errorMsg = ''
                 } else {
                     this.showLoginForm = false
                     this.showForgotPassword = true
