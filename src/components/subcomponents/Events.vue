@@ -4,7 +4,7 @@
                 Note:cannot control xs6 sizes if use column layout -->
                 <!-- <div ref="mapaa" style="height: 400px; width: 700px;"></div> -->
                 <v-layout justify-center row wrap>
-                    <v-flex xs10 sm10 md4 :class="{'pb-4': paddingBottom, 'pr-4': paddingRight}">
+                    <v-flex xs12 sm12 md4 :class="{'pb-4': paddingBottom, 'pr-4': paddingRight}">
                         <v-layout justify-center>
                             <v-dialog v-model="dialogPostEvent" fullscreen hide-overlay transition="dialog-bottom-transition">
                                 <v-btn round outline class="ma-0 text-md-center" slot="activator" color="primary" dark>Create Event</v-btn>
@@ -40,7 +40,7 @@
                             </v-dialog>
                         </v-layout>
                     </v-flex>
-                    <v-flex xs10 sm10 md8>
+                    <v-flex xs12 sm12 md8>
                        <!-- event details when clicked -->
                         <v-dialog v-model="dialogEvent" scrollable max-width="80%" max-height="80%">
                             <v-card>
@@ -88,14 +88,17 @@
                                             <div>
                                                 <div class="headline"><a style="text-decoration: none; color: inherit;" @click="expandEvent(event); dialogEvent = true">{{ event.title | trimCardText }}</a></div>
                                                 <span class="grey--text">{{ event.createdOn | formatDate }}</span>
+                                                <p style="padding: 0; margin: 0" class="grey--text">By: {{ event.userName }}</p>
+                                                <p style="padding: 0; margin: 0" class="grey--text">{{ event.likes }} likes</p>
                                             </div>
 
                                         </v-card-title>
                                         <v-spacer></v-spacer>
+                                        <!--
                                         <v-list-tile-content>
                                             <v-list-tile-title class="text-xs-center">{{ event.userName }}</v-list-tile-title>
                                             <v-list-tile-title class="text-xs-center">{{ event.likes }} likes</v-list-tile-title>
-                                        </v-list-tile-content>
+                                        </v-list-tile-content> -->
 
                                         <v-btn icon>
                                             <v-icon @click="likeEvent(event)">favorite</v-icon>
@@ -183,7 +186,8 @@
                     state: this.event.state,
                     country: this.event.country,
                     latitude: parseFloat(this.event.latitude),
-                    longitude: parseFloat(this.event.longitude)
+                    longitude: parseFloat(this.event.longitude),
+                    likes: 0
 
                 }).then(ref => {
                     
