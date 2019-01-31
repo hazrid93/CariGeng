@@ -20,12 +20,86 @@
                                     </v-toolbar-items>
                                     </v-toolbar>
                                     <!--event form section-->  
-                                   
                                         <v-layout mt-4 justify-center row wrap style="height: inherit;">
                                             <v-flex xs10 sm10 md8>
                                                 <v-form ref="form" lazy-validation>    
                                                     <v-text-field v-model.trim="event.title" label="Title" required ></v-text-field>
-                                                    <v-text-field v-model.trim="event.content" label="Content" required ></v-text-field>
+                                                   <!-- TipTap implementation here to replace normal text field
+                                                       <v-text-field v-model.trim="event.content" label="Content" required ></v-text-field> -->
+                                                    <div class="editor">
+                                                        <editor-menu-bar :editor="editor">
+                                                            <div class="menubar" slot-scope="{ commands, isActive }">
+                                                            <div class="toolbar">
+                                                            <button class="menubar__button" :class="{ 'is-active': isActive.bold() }" @click.prevent="commands.bold" > <icon name="bold" /> </button>
+
+                                                            <button class="menubar__button" :class="{ 'is-active': isActive.italic() }" @click.prevent="commands.italic" > <icon name="italic" /> </button>
+
+                                                            <button class="menubar__button" :class="{ 'is-active': isActive.strike() }" @click.prevent="commands.strike" > <icon name="strike" /> </button>
+
+                                                            <button class="menubar__button" :class="{ 'is-active': isActive.underline() }" @click.prevent="commands.underline" > <icon name="underline" /> </button>
+
+                                                            <button class="menubar__button" :class="{ 'is-active': isActive.code() }" @click.prevent="commands.code" > <icon name="code" /> </button>
+
+                                                            <button class="menubar__button" :class="{ 'is-active': isActive.paragraph() }" @click.prevent="commands.paragraph" > <icon name="paragraph" /> </button>
+
+                                                            <button class="menubar__button" :class="{ 'is-active': isActive.heading({ level: 1 }) }" @click.prevent="commands.heading({ level: 1 })" > H1 </button>
+
+                                                            <button class="menubar__button" :class="{ 'is-active': isActive.heading({ level: 2 }) }" @click.prevent="commands.heading({ level: 2 })" > H2 </button>
+
+                                                            <button class="menubar__button" :class="{ 'is-active': isActive.heading({ level: 3 }) }" @click.prevent="commands.heading({ level: 3 })" > H3 </button>
+
+                                                            <button class="menubar__button" :class="{ 'is-active': isActive.bullet_list() }" @click.prevent="commands.bullet_list" > <icon name="ul" /> </button>
+
+                                                            <button class="menubar__button" :class="{ 'is-active': isActive.ordered_list() }" @click.prevent="commands.ordered_list" > <icon name="ol" /> </button>
+
+                                                            <button class="menubar__button" :class="{ 'is-active': isActive.blockquote() }" @click.prevent="commands.blockquote" > <icon name="quote" /> </button>
+
+                                                            <button class="menubar__button" :class="{ 'is-active': isActive.code_block() }" @click.prevent="commands.code_block" > <icon name="code" /> </button>
+
+                                                            <button class="menubar__button" @click.prevent="commands.horizontal_rule" > <icon name="hr" /> </button>
+
+                                                            <button class="menubar__button" @click.prevent="commands.undo" > <icon name="undo" /> </button>
+
+                                                            <button class="menubar__button" @click.prevent="commands.redo" > <icon name="redo" /> </button>
+                                                            
+                                                            <!-- table part here -->
+                                                            <button class="menubar__button" @click.prevent="commands.createTable({rowsCount: 3, colsCount: 3, withHeaderRow: false })" > <icon name="table" /> </button>
+
+                                                                <span v-if="isActive.table()">
+                                                                    <button class="menubar__button" @click.prevent="commands.deleteTable" > <icon name="delete_table" /> </button>
+                                                                    <button class="menubar__button" @click.prevent="commands.addColumnBefore" > <icon name="add_col_before" /> </button>
+                                                                    <button class="menubar__button" @click.prevent="commands.addColumnAfter" > <icon name="add_col_after" /> </button>
+                                                                    <button class="menubar__button" @click.prevent="commands.deleteColumn" > <icon name="delete_col" /> </button>
+                                                                    <button class="menubar__button" @click.prevent="commands.addRowBefore" > <icon name="add_row_before" /> </button>
+                                                                    <button class="menubar__button" @click.prevent="commands.addRowAfter" > <icon name="add_row_after" /> </button>
+                                                                    <button class="menubar__button" @click.prevent="commands.deleteRow" > <icon name="delete_row" /> </button>
+                                                                    <button class="menubar__button" @click.prevent="commands.toggleCellMerge" > <icon name="combine_cells" /> </button>
+                                                                </span>
+                                                            </div>
+                                                            </div>
+                                                        </editor-menu-bar>
+
+                                                        <editor-content class="editor__content" :editor="editor" />
+                                                    </div>
+
+                                                    <div class="actions">
+                                                        <button class="button" @click.prevent="clearContent">
+                                                            Clear Content
+                                                        </button>
+                                                        <button class="button" @click.prevent="setContent">
+                                                            Set Content
+                                                        </button>
+                                                        </div>
+
+                                                        <div class="export">
+                                                        <h3>JSON</h3>
+                                                        <pre><code v-html="json"></code></pre>
+
+                                                        <h3>HTML</h3>
+                                                        <pre><code>{{ html }}</code></pre>
+                                                        </div>
+                                                    </div>
+                                                    
                                                     <v-text-field v-model.trim="event.address" label="Address" required ></v-text-field>
                                                     <v-text-field v-model.trim="event.city" label="City" required ></v-text-field>
                                                     <v-text-field v-model.trim="event.state" label="State" required ></v-text-field>
@@ -125,6 +199,31 @@
 <script>
     import { mapState } from 'vuex'
     import moment from 'moment'
+    import Icon from './Icon.vue'
+    import { Editor, EditorContent, EditorMenuBar } from 'tiptap'
+    import {
+    Blockquote,
+    CodeBlock,
+    HardBreak,
+    Heading,
+    HorizontalRule,
+    OrderedList,
+    BulletList,
+    ListItem,
+    TodoItem,
+    TodoList,
+    Bold,
+    Code,
+    Italic,
+    Link,
+    Strike,
+    Underline,
+    History,
+    Table,
+    TableHeader,
+    TableCell,
+    TableRow
+    } from 'tiptap-extensions'
     const fb = require('../../firebaseConfig.js')
 
     export default {
@@ -150,9 +249,69 @@
                 currentEvent: {},
                 map: {},
                 mapMarker: {},
-                mapBoolean: true
-            }
-                
+                mapBoolean: true,
+                //tiptap part
+                editor: new Editor({
+                    extensions: [
+                    new Blockquote(),
+                    new BulletList(),
+                    new CodeBlock(),
+                    new HardBreak(),
+                    new Heading({ levels: [1, 2, 3] }),
+                    new HorizontalRule(),
+                    new ListItem(),
+                    new OrderedList(),
+                    new TodoItem(),
+                    new TodoList(),
+                    new Bold(),
+                    new Code(),
+                    new Italic(),
+                    new Link(),
+                    new Strike(),
+                    new Underline(),
+                    new History(),
+                    new Table(),
+                    new TableHeader(),
+                    new TableCell(),
+                    new TableRow()
+                    ],
+                    content: `
+                    <h2>
+                    Tables
+                    </h2>
+                    <p>
+                    Tables come with some useful commands like adding, removing or merging rows and columns. Navigate with <code>tab</code> or arrow keys. Resizing is also supported.
+                    </p>
+                    <table>
+                    <tr>
+                        <th colspan="3" data-colwidth="100,0,0">Wide header</th>
+                    </tr>
+                    <tr>
+                        <td>One</td>
+                        <td>Two</td>
+                        <td>Three</td>
+                    </tr>
+                    <tr>
+                        <td>Four</td>
+                        <td>Five</td>
+                        <td>Six</td>
+                    </tr>
+                    </table>
+                    `,
+                    onUpdate: ({ getJSON, getHTML }) => {
+                        this.json = getJSON()
+                        this.html = getHTML()
+                    }
+                   
+                }),
+                json: 'Update content to see changes',
+                html: 'Update content to see changes',
+            }   
+        },
+        components: {
+            EditorContent,
+            EditorMenuBar,
+            Icon
         },
         computed: {
             //use mapState to get access to all state properties or
@@ -242,9 +401,29 @@
                     map: this.map,
                     title: 'We are here!'
                 });
+            },
+            clearContent() {
+                this.editor.clearContent(true)
+                this.editor.focus()
+            },
+            setContent() {
+                // you can pass a json document
+                this.editor.setContent({
+                    type: 'doc',
+                    content: [{
+                    type: 'paragraph',
+                    content: [
+                        {
+                        type: 'text',
+                        text: 'This is some inserted text. 👋',
+                        },
+                    ],
+                    }],
+                }, true)
+                // HTML string is also supported
+                // this.editor.setContent('<p>This is some inserted text. 👋</p>')
+                this.editor.focus()
             }
-
-                 
         },
         filters: {
             formatDate(val) {
@@ -267,12 +446,121 @@
         },
         beforeDestroy () {
             if (typeof window !== 'undefined') {
-            window.removeEventListener('resize', this.onResize, { passive: true })
+                window.removeEventListener('resize', this.onResize, { passive: true })
             }
+            // destroy tiptap editor
+            this.editor.destroy()
         }
     }
 </script>
 
 <style scoped>
+.menubar__button.is-active {
+    background-color: rgba(0,0,0,.1); 
+}
+
+.menubar__button:hover {
+    background-color: rgba(0,0,0,.05);
+}
+
+.menubar__button {
+    font-weight: 700;
+    /*display: -webkit-inline-box;
+    display: -ms-inline-flexbox;
+    display: inline-flex;*/
+    background: rgba(0,0,0,0);
+    border: 0;
+    color: #000;
+    padding: .2rem .5rem;
+    margin-right: .2rem;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.menubar {
+    margin-bottom: 1rem;
+    -webkit-transition: visibility .2s .4s,opacity .2s .4s;
+    transition: visibility .2s .4s,opacity .2s .4s;
+}
+
+</style>
+
+<style>
+/*
+.editor__content div .tableWrapper {
+    margin: 1em 0;
+    overflow-x: auto;
+}
+
+.editor__content div div .tableWrapper table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+
+.editor__content div .tableWrapper table td, .editor__content div .tableWrapper table th {
+    min-width: 1em;
+    border: 2px solid #ddd;
+    padding: 3px 5px;
+    vertical-align: top;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+    border-color: blue;
+}
+
+.editor__content * {
+    caret-color: currentColor;
+}
+
+*/
+.editor__content table td {
+    min-width: 1em;
+    border: 2px solid #ddd;
+    padding: 3px 5px;
+    vertical-align: top;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+    border-color: grey;
+}
+
+.editor__content table tr {
+    min-width: 1em;
+    border: 2px solid #ddd;
+    padding: 3px 5px;
+    vertical-align: top;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+    border-color: grey;
+}
+
+.editor__content table th {
+    min-width: 1em;
+    border: 2px solid #ddd;
+    padding: 3px 5px;
+    vertical-align: top;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+    border-color: grey;
+}
+
+.editor__content .tableWrapper table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+
+
+.editor__content .tableWrapper {
+    margin: 1em 0;
+    overflow-x: auto;
+}
 
 </style>
