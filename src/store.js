@@ -12,6 +12,7 @@ fb.auth.onAuthStateChanged(user => {
       
       fb.usersCollection.doc(user.uid).onSnapshot(doc => {
         store.commit('setUserProfile', doc.data())
+       // console.log("setuserprofile logged")
       })
 
       // realtime updates from our posts collection
@@ -69,6 +70,7 @@ export const store =  new Vuex.Store({
         theme: null,    
         currentUser: null,
         userProfile: {},
+        userProfileImage: '',
         posts: [],
         hiddenPosts: [],
         events: []
@@ -101,6 +103,9 @@ export const store =  new Vuex.Store({
         setEvents(state, val) {
           state.events = val
         },
+        setuserProfileImage(state, val) {
+          state.userProfileImage = val
+        },
     },
     //actions are asynchronous
     actions: {
@@ -115,6 +120,19 @@ export const store =  new Vuex.Store({
               console.log(err)
           })
         },
+        fetchUserProfileImage({ commit, state }) {
+          return new Promise((resolve, reject) => {
+            fb.usersCollection.doc(state.currentUser.uid).get().then(res => {
+              commit('setuserProfileImage', res.data().user_image)
+              resolve()
+              // console.log(res.data().user_image)
+              }).catch(err => {
+                  reject()
+                  console.log(err)
+              })
+          })
+
+        },
         clearData({commit}){
           commit('setCurrentUser', null)
           commit('setUserProfile', {})
@@ -124,8 +142,9 @@ export const store =  new Vuex.Store({
         updateProfile({ commit, state }, data) {
           let name = data.name
           let title = data.title
+          let user_image = data.user_image
       
-          fb.usersCollection.doc(state.currentUser.uid).update({ name, title }).then(user => {
+          fb.usersCollection.doc(state.currentUser.uid).update({ name, title, user_image }).then(user => {
               // update all posts by user to reflect new name
               fb.postsCollection.where('userId', '==', state.currentUser.uid).get().then(docs => {
                   docs.forEach(doc => {

@@ -62,7 +62,7 @@
                             <v-list-tile-title>Menu</v-list-tile-title>
                         </v-list-tile-content>
                     </v-list-tile> -->
-
+                    <!--
                     <v-list-tile @click="">
                         <v-list-tile-action>
                             <v-icon>bubble_chart</v-icon>
@@ -70,7 +70,7 @@
                         <v-list-tile-content>
                             <v-list-tile-title><router-link to="/home/lyrics" tag="li" active-class="active" exact>Lyrics</router-link></v-list-tile-title>
                         </v-list-tile-content>
-                    </v-list-tile>
+                    </v-list-tile> -->
                 </v-list>
             </v-navigation-drawer>
 
@@ -115,7 +115,7 @@
     export default {
         data: function() {
             return {
-                drawer: null
+                drawer: false
             }
         },
         methods: {

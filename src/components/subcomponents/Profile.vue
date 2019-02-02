@@ -23,7 +23,7 @@
 
                 <!-- for comments section -->
                 <v-flex xs12 mb-4>
-                    <v-list two-line>
+                    <v-list three-line>
                         <!--
                             <v-subheader
                                 v-if="hiddenPosts.length" 
@@ -40,15 +40,16 @@
                                 <v-list-tile :key="post.title" avatar ripple >   
                                     
                                     <v-list-tile-avatar>
-                                    <img :src="post.avatar">
+                                    <img :src="user_image_url">
                                     </v-list-tile-avatar>
                     
                                     <v-list-tile-content>
                                         <v-list-tile-title>{{ post.userName }}</v-list-tile-title>
                                         <v-list-tile-sub-title>{{ post.content | trimLength }}</v-list-tile-sub-title>
-                                        <v-list-tile-sub-title ><a @click="openCommentModal(post)">comments {{ post.comments }}</a> <a @click="viewPost(post)">view full post</a></v-list-tile-sub-title>
+                                        <v-list-tile-sub-title ><a @click="openCommentModal(post)">comments {{ post.comments }}</a> <a @click="viewPost(post)">view full post</a> </v-list-tile-sub-title>
                                     </v-list-tile-content>
                                     <v-list-tile-action>
+                                        <v-icon style="color:red" @click="delete_dialog = true; delete_post = post">close</v-icon> 
                                         <v-list-tile-action-text>{{ post.createdOn | formatDate }}</v-list-tile-action-text>
                                         <v-list-tile-action-text>{{ post.likes }} likes</v-list-tile-action-text>
                                         <v-icon v-if="selected.indexOf(index) < 0" @click="likePost(post.id, post.likes); toggle(index)" color="grey lighten-1">star_border</v-icon>
@@ -65,8 +66,21 @@
                             <p>There are currently no posts</p>
                         </div>
                     </v-list>
+                    <!--delete confirmation part -->
+                    <v-dialog v-model="delete_dialog" max-width="290">
+                        <v-card>
+                            <v-card-title class="headline">Delete this post?</v-card-title>
+                            <v-card-text>Deleted post are not recoverable</v-card-text>
+                            <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn color="green darken-1" flat @click="delete_dialog = false">Cancel</v-btn>
+                            <v-btn color="green darken-1" flat @click="deletePost()">Delete</v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
                 </v-flex>
             </v-layout>
+            <p>{{ delete_post }}</p>
         </v-container>   
 
         <!-- comment modal -->
@@ -131,7 +145,10 @@
                 showPostModal: false,
                 fullPost: {},
                 postComments: [],
-                selected: []
+                selected: [],
+                user_image_url: '',
+                delete_dialog: false,
+                delete_post: {}
             }
         },
         computed: {
@@ -139,6 +156,33 @@
             //use mapGetters to get all the getters specified in store.js
             //will use mapState for now
             ...mapState(['userProfile','currentUser','posts','hiddenPosts'])
+
+            /* mapGetter example
+
+            {
+                computed: {
+                    ...mapGetters([
+                        'getter1',
+                        'getter2',
+                        'getter3'
+                    ]);
+                }
+            }
+
+            {
+                computed: {
+                    getter1() {
+                        return this.$store.getters.getter1;
+                    },
+                    getter2() {
+                        return this.$store.getters.getter2;
+                    },
+                    getter3() {
+                        return this.$store.getters.getter3;
+                    },
+                }
+            }
+            */
         },
         methods: {
             createPost() {
@@ -243,6 +287,31 @@
                 } else {
                 this.selected.push(index)
                 }
+            },
+            getUserImage() {
+                //use promise to watch store to finish update the user profile
+                // fetchUserProfileImage will return a promise
+                this.$store.dispatch('fetchUserProfileImage').then(() => {
+                        var user_image_name = this.$store.getters.getUserProfile.user_image
+                        fb.storage.ref().child(`user_profile_image/${user_image_name}`).getDownloadURL().then((url) => {
+                        this.user_image_url = url
+                    }).catch(function(error) {
+                        // Handle any errors
+                    });
+                })
+            },
+            deletePost() {
+
+                fb.postsCollection.doc(this.delete_post.id).set({
+                    postId: postId,
+                    userId: this.currentUser.uid
+                }).then(() => {
+                    // update post likes
+                    fb.postsCollection.doc(postId).update({
+                        likes: postLikes + 1
+                    })
+                })
+
             }
         },
         filters: {
@@ -252,9 +321,12 @@
                 return moment(date).fromNow()
             },
             trimLength(val) {
-                if (val.length < 200) { return val }
-                return `${val.substring(0, 200)}...`
+                if (val.length < 100) { return val }
+                return `${val.substring(0, 100)}...`
             }
+        },
+        created() {
+            this.getUserImage()
         }
     }
 </script>

@@ -22,11 +22,14 @@
                                     <!--event form section-->  
                                         <v-layout mt-4 justify-center row wrap style="height: inherit;">
                                             <v-flex xs10 sm10 md8>
-                                                <v-form ref="form" lazy-validation>    
-                                                    <v-text-field v-model.trim="event.title" label="Title" required ></v-text-field>
+                                                <v-form ref="form" lazy-validation>  
+                                                    <h6 class="title">Title</h6>  
+                                                    <v-text-field v-model.trim="event.title" required single-line></v-text-field>
                                                    <!-- TipTap implementation here to replace normal text field
                                                        <v-text-field v-model.trim="event.content" label="Content" required ></v-text-field> -->
-                                                    <div class="editor">
+                                                    <h6 class="title">Content</h6>
+                                                    <div class="editor" style="margin-top: 20px; margin-bottom: 20px; border: 2px solid grey; border-radius: 5px; padding-left: 20px; padding-right: 20px">
+                                                        
                                                         <editor-menu-bar :editor="editor">
                                                             <div class="menubar" slot-scope="{ commands, isActive }">
                                                             <div class="toolbar">
@@ -82,30 +85,35 @@
                                                         <editor-content class="editor__content" :editor="editor" />
                                                     </div>
 
-                                                    <div class="actions">
-                                                        <button class="button" @click.prevent="clearContent">
-                                                            Clear Content
-                                                        </button>
+                                                    <div class="actions" style="margin-bottom: 20px;" >
+                                                        <v-btn round outline dark color="primary" @click.prevent="clearContent">Clear Content</v-btn>
+                                                        <!--
                                                         <button class="button" @click.prevent="setContent">
                                                             Set Content
-                                                        </button>
-                                                        </div>
+                                                        </button> -->
+                                                        
 
+                                                        <!--
                                                         <div class="export">
                                                         <h3>JSON</h3>
                                                         <pre><code v-html="json"></code></pre>
 
                                                         <h3>HTML</h3>
                                                         <pre><code>{{ html }}</code></pre>
-                                                        </div>
+                                                        </div> -->
                                                     </div>
-                                                    
-                                                    <v-text-field v-model.trim="event.address" label="Address" required ></v-text-field>
-                                                    <v-text-field v-model.trim="event.city" label="City" required ></v-text-field>
-                                                    <v-text-field v-model.trim="event.state" label="State" required ></v-text-field>
-                                                    <v-text-field v-model.trim="event.country" label="Country" required ></v-text-field>
-                                                    <v-text-field v-model="event.latitude" type="number" label="Latitude" required ></v-text-field>
-                                                    <v-text-field v-model="event.longitude" type="number" label="Longitude" required ></v-text-field>
+                                                    <h6 class="title">Address</h6>
+                                                    <v-text-field v-model.trim="event.address" required single-line ></v-text-field>
+                                                    <h6 class="title">City</h6>
+                                                    <v-text-field v-model.trim="event.city" required single-line></v-text-field>
+                                                    <h6 class="title">State</h6>
+                                                    <v-text-field v-model.trim="event.state" required single-line></v-text-field>
+                                                    <h6 class="title">Country</h6>
+                                                    <v-text-field v-model.trim="event.country" required single-line></v-text-field>
+                                                    <h6 class="title">Latitude</h6>
+                                                    <v-text-field v-model="event.latitude" type="number" required single-line></v-text-field>
+                                                    <h6 class="title">Longitude</h6>
+                                                    <v-text-field v-model="event.longitude" type="number" required single-line></v-text-field>
                                                 </v-form>
                                             </v-flex>
                                         </v-layout>
@@ -117,25 +125,29 @@
                     <v-flex xs12 sm12 md8>
                        <!-- event details when clicked -->
                         <v-dialog v-model="dialogEvent" scrollable max-width="100%" max-height="100%">
+                            
                             <v-card>
                                 <v-card-title>Event Details</v-card-title>
                                 <v-divider></v-divider>
                                 
                                 <v-card-text>
-                                    <h3 style="text-decoration: underline">Title</h3>
-                                    <p>{{ currentEvent.title }}</p>
-
-                                    <h3 style="text-decoration: underline">Information</h3>
-                                    <p>{{ currentEvent.content }}</p>
+                                    <h6 class="title" style="text-decoration: underline">Title</h6>
+                                    <p style="padding-top:10px; margin-bottom: 20px;">{{ currentEvent.title }}</p>
                            
-                                    <h3 style="text-decoration: underline">Created By</h3>
-                                    <p>{{ currentEvent.userName }}</p>
+                                    <h6 class="title" style="text-decoration: underline">Created By</h6>
+                                    <p style=" padding-top:10px; margin-bottom: 20px;">{{ currentEvent.userName }}</p>
 
-                  
-                                    <h3 style="text-decoration: underline">Location</h3>
+                                    <h6 class="title" style="text-decoration: underline">Event Information</h6>
+                                    <div style=" padding-top:10px; margin-bottom: 20px;" v-html="currentEvent.content"></div>
+
+                                    <h6 class="title" style="text-decoration: underline">Location</h6>
+                                    <div style=" padding-top:10px; margin-bottom: 20px;">
                                     <div v-if="mapBoolean" ref="mapCanvas" style="height: 350px; width: 100%;"></div>
                                     <div v-else style="height: 350px; width: 100%;"><p>No location specified for this event</p></div>
+                                    </div>
                                 </v-card-text>
+
+                                
                                 
                                 <v-divider></v-divider>
                                 <v-card-actions>
@@ -237,7 +249,8 @@
                     state: '',
                     country: '',
                     latitude: 0.0,
-                    longitude: 0.0
+                    longitude: 0.0,
+                    content: ''
                 },
                 dialogPostEvent: false,
                 dialogEvent: false,
@@ -276,31 +289,15 @@
                     new TableRow()
                     ],
                     content: `
-                    <h2>
-                    Tables
-                    </h2>
-                    <p>
-                    Tables come with some useful commands like adding, removing or merging rows and columns. Navigate with <code>tab</code> or arrow keys. Resizing is also supported.
-                    </p>
-                    <table>
-                    <tr>
-                        <th colspan="3" data-colwidth="100,0,0">Wide header</th>
-                    </tr>
-                    <tr>
-                        <td>One</td>
-                        <td>Two</td>
-                        <td>Three</td>
-                    </tr>
-                    <tr>
-                        <td>Four</td>
-                        <td>Five</td>
-                        <td>Six</td>
-                    </tr>
-                    </table>
+                      <br>
+                      <br>
+                      <br>
                     `,
                     onUpdate: ({ getJSON, getHTML }) => {
                         this.json = getJSON()
+                        
                         this.html = getHTML()
+                        this.event.content = this.html
                     }
                    
                 }),
