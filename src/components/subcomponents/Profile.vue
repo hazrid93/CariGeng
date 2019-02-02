@@ -49,7 +49,7 @@
                                         <v-list-tile-sub-title ><a @click="openCommentModal(post)">comments {{ post.comments }}</a> <a @click="viewPost(post)">view full post</a> </v-list-tile-sub-title>
                                     </v-list-tile-content>
                                     <v-list-tile-action>
-                                        <v-icon style="color:red" @click="delete_dialog = true; delete_post = post">close</v-icon> 
+                                        <v-icon style="color:red" @click="delete_post = post ; delete_dialog = true">close</v-icon> 
                                         <v-list-tile-action-text>{{ post.createdOn | formatDate }}</v-list-tile-action-text>
                                         <v-list-tile-action-text>{{ post.likes }} likes</v-list-tile-action-text>
                                         <v-icon v-if="selected.indexOf(index) < 0" @click="likePost(post.id, post.likes); toggle(index)" color="grey lighten-1">star_border</v-icon>
@@ -67,7 +67,7 @@
                         </div>
                     </v-list>
                     <!--delete confirmation part -->
-                    <v-dialog v-model="delete_dialog" max-width="290">
+                    <v-dialog v-model="delete_dialog" persistent max-width="290">
                         <v-card>
                             <v-card-title class="headline">Delete this post?</v-card-title>
                             <v-card-text>Deleted post are not recoverable</v-card-text>
@@ -80,7 +80,7 @@
                     </v-dialog>
                 </v-flex>
             </v-layout>
-            <p>{{ delete_post }}</p>
+           
         </v-container>   
 
         <!-- comment modal -->
@@ -301,17 +301,14 @@
                 })
             },
             deletePost() {
-
-                fb.postsCollection.doc(this.delete_post.id).set({
-                    postId: postId,
-                    userId: this.currentUser.uid
-                }).then(() => {
-                    // update post likes
-                    fb.postsCollection.doc(postId).update({
-                        likes: postLikes + 1
-                    })
+                console.log(this.delete_post.id)
+                fb.postsCollection.doc(this.delete_post.id).delete().then(() => {
+            
+                }).catch(err => {
+                    console.log(err)  
                 })
-
+                 
+                this.delete_dialog = false
             }
         },
         filters: {
