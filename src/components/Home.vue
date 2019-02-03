@@ -76,7 +76,17 @@
 
             <v-toolbar color="black" dark fixed app>
                 <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-                <v-toolbar-title>CariGeng</v-toolbar-title>
+                <v-toolbar-title>
+                    <div class="col1 headerName">
+                           <!-- <h3 class="display-2 font-weight-bold">CariGeng</h3> -->
+                            <div class="svgWrap">
+                                <svg class="iconSize" viewBox="60 -5 90 30">
+                                    <text font-family="Permanent Marker" class="left-leg" text-anchor="start" x="0%" y="50%" >Cari</text>
+                                    <text font-family="Permanent Marker" class="right-leg" text-anchor="start" x="50%" y="50%" >Geng</text>
+                                </svg>
+                            </div>
+                        </div>
+                </v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-toolbar-items class="hidden-sm-and-down">
         <!--    <v-btn flat>Link One</v-btn>
@@ -167,7 +177,35 @@
 </script>
 
 <style scoped>
+.headerName {
+    text-align: left;
+    padding: 5px;
+}
 
+.iconSize {
+width: 100%;
+height: 100%;
+}
+
+.svgWrap {
+    width: 100%;
+    height: 40px;
+}
+
+.left-leg {
+fill: orange;
+animation: dance 2s infinite alternate;
+
+}
+.right-leg {
+    fill: white;
+}
+
+@keyframes dance {
+    100% {
+        transform: rotate(6deg);
+    }
+}
 
 a {
     text-decoration: none;

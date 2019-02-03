@@ -5,6 +5,27 @@
                 Note:cannot control xs6 sizes if use column layout -->
             <v-layout justify-center row wrap>
                 <v-flex xs6 mb-4>
+                    <div class="v-card-profile">
+                        <v-avatar
+                            slot="offset"
+                            class="mx-auto d-block"
+                            size="130"
+                        >
+                            <img
+                            src="https://demos.creative-tim.com/vue-material-dashboard/img/marc.aba54d65.jpg"
+                            >
+                        </v-avatar>
+                        <v-card-text class="text-xs-center">
+                            <h6 class="category text-gray font-weight-thin mb-3">CEO / CO-FOUNDER</h6>
+                            <h4 class="card-title font-weight-light">Alec Thompson</h4>
+                            <p class="card-description font-weight-light">Don't be scared of the truth because we need to restart the human foundation in truth And I love you like Kanye loves Kanye I love Rick Owens’ bed design but the back is...</p>
+                            <v-btn
+                            color="success"
+                            round
+                            class="font-weight-light"
+                            >Follow</v-btn>
+                        </v-card-text>
+                    </div>
                     <div>
                         <p class="font-weight-black text-sm-center title">Name: {{ userProfile.name }}</p>
                         <p class="font-weight-black text-sm-center title">Title: {{ userProfile.title }}</p>
@@ -15,7 +36,9 @@
                                     v-model.trim="post.content"
                                     type="text"
                                 ></v-text-field>
-                                <v-btn @click="createPost" color="primary" dark :disabled="post.content == ''">Post</v-btn>
+                                <div style="width: 100%; text-align: center">
+                                    <v-btn @click="createPost" color="primary" round outline dark :disabled="post.content == ''">Post</v-btn>
+                                </div>
                             </v-form>
                         </div>
                     </div>
@@ -23,6 +46,7 @@
 
                 <!-- for comments section -->
                 <v-flex xs12 mb-4>
+                    <v-card>
                     <v-list three-line>
                         <!--
                             <v-subheader
@@ -35,12 +59,13 @@
                                     new <span v-if="hiddenPosts.length > 1">posts</span><span v-else>post</span>
                                 </p>                                
                             </v-subheader> -->
+                        <v-divider></v-divider>
                         <div v-if="posts.length">
                             <template v-for="(post, index) in posts">
-                                <v-list-tile :key="post.title" avatar ripple >   
+                                <v-list-tile :key="post.title" avatar ripple dark>   
                                     
-                                    <v-list-tile-avatar>
-                                    <img :src="user_image_url">
+                                    <v-list-tile-avatar tile>
+                                    <img style="border-radius: 7px" :src="user_image_url">
                                     </v-list-tile-avatar>
                     
                                     <v-list-tile-content>
@@ -78,6 +103,7 @@
                             </v-card-actions>
                         </v-card>
                     </v-dialog>
+                </v-card>
                 </v-flex>
             </v-layout>
            
@@ -91,7 +117,9 @@
                     <p>add a comment</p>
                     <form @submit.prevent>
                         <textarea v-model.trim="comment.content"></textarea>
-                        <button @click="addComment" :disabled="comment.content == ''" class="button">add comment</button>
+                        <div style="width: 100%; ">
+                            <button style=" margin-left: auto; margin-right: auto" @click="addComment" :disabled="comment.content == ''" class="button">add comment</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -301,13 +329,11 @@
                 })
             },
             deletePost() {
-                console.log(this.delete_post.id)
                 fb.postsCollection.doc(this.delete_post.id).delete().then(() => {
-            
+    
                 }).catch(err => {
                     console.log(err)  
                 })
-                 
                 this.delete_dialog = false
             }
         },
