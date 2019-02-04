@@ -207,7 +207,8 @@
                                     fb.usersCollection.doc(user.user.uid).set({
                                         name: this.signupForm.name,
                                         title: this.signupForm.title,
-                                        user_description: this.signupForm.user_description
+                                        user_description: this.signupForm.user_description,
+                                        user_image: ''
                                     }).then(() => {
                                         this.$store.dispatch('fetchUserProfile')
                                         this.performingRequest = false;

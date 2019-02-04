@@ -213,7 +213,8 @@
                 delete_dialog: false,
                 delete_post: {},
                 numberOfUserEvent: 0,
-                isUserProfile: false
+                isUserProfile: false,
+                profileUID: ''
             }
         },
         computed: {
@@ -357,14 +358,26 @@
             getUserImage() {
                 //use promise to watch store to finish update the user profile
                 // fetchUserProfileImage will return a promise
-                this.$store.dispatch('fetchUserProfileImage').then(() => {
-                        var user_image_name = this.$store.getters.getUserProfile.user_image
-                        fb.storage.ref().child(`user_profile_image/${user_image_name}`).getDownloadURL().then((url) => {
-                        this.user_image_url = url
-                    }).catch(function(error) {
-                        // Handle any errors
-                    });
-                })
+                if(this.isUserProfile){
+                    this.$store.dispatch('fetchUserProfileImage', { actualUser: true }).then(() => {
+                            var user_image_name = this.$store.getters.getUserProfileImage
+                            fb.storage.ref().child(`user_profile_image/${user_image_name}`).getDownloadURL().then((url) => {
+                            this.user_image_url = url
+                        }).catch(function(error) {
+                            // Handle any errors
+                        });
+                    })
+                } else {
+                    console.log(this.profileUID)
+                     this.$store.dispatch('fetchUserProfileImage', { actualUser: false, userId: this.profileUID }).then(() => {
+                            var user_image_name = this.$store.getters.getUserProfileImage
+                            fb.storage.ref().child(`user_profile_image/${user_image_name}`).getDownloadURL().then((url) => {
+                            this.user_image_url = url
+                        }).catch(function(error) {
+                            // Handle any errors
+                        });
+                    })
+                }
             },
             deletePost() {
                 fb.postsCollection.doc(this.delete_post.id).delete().then(() => {
@@ -376,6 +389,7 @@
             },
             getUserEvent() {
                 //this.currentUser.uid
+                if(this.isUserProfile){
                    fb.eventsCollection.where("userId", "==", this.currentUser.uid).get().then(querySnapshot => {
                     let numberOfUserEvent = 0
 
@@ -385,6 +399,17 @@
                    
                     this.numberOfUserEvent = numberOfUserEvent 
                     })
+                } else {
+                    fb.eventsCollection.where("userId", "==", this.profileUID).get().then(querySnapshot => {
+                    let numberOfUserEvent = 0
+
+                    querySnapshot.forEach(doc => {
+                        numberOfUserEvent = numberOfUserEvent + 1
+                    })
+                   
+                    this.numberOfUserEvent = numberOfUserEvent 
+                    })
+                }
             },
         },
         filters: {
@@ -402,31 +427,35 @@
                 return `${val.substring(0, 100)}...`
             }
         },
-        beforeCreate(){
-            //console.log( this.$route.params.username)
-            //this.currentUser.uid
-            //this.userProfile.name
+        created() {
+            this.profileUID = this.currentUser.uid
+
             fb.usersCollection.where('name', '==', this.$route.params.username).get().then(docs => {
                if(docs.docs.length){
                    
                     if(this.currentUser.uid == docs.docs[0].id && this.userProfile.name == this.$route.params.username){
                         this.isUserProfile = true
+                        this.getUserImage()
+                        this.getUserEvent() 
                     } else {
                         this.isUserProfile = false
-                        this.$router.push('/home')
+                        //console.log(docs.docs[0].id)
+                        this.profileUID = docs.docs[0].id
+                        this.getUserImage()
+                        this.getUserEvent() 
+                        //this.$router.push('/home')
                     }
                } else {
                     this.isUserProfile = false
+                    // USER DOESNT EXIST
                     this.$router.push('/home')
                }
             })
-        },
-        created() {
-            this.getUserImage()
-            
+         
         },
         mounted() {
-            this.getUserEvent() 
+         //   this.getUserImage()
+          //  this.getUserEvent() 
         }
     }
 </script>
