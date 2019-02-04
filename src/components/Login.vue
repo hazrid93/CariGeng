@@ -143,9 +143,10 @@
                 }
             },            
             login() {
+                
                 this.performingRequest = true;
                 fb.auth.signInWithEmailAndPassword(this.loginForm.email, this.loginForm.password).then(user => {
-                    
+                   // console.log(user.user)
                    this.$store.commit('setCurrentUser', user.user)
                    this.$store.dispatch('fetchUserProfile')
                     this.performingRequest = false
@@ -159,27 +160,40 @@
             },
             signup() {
                 this.performingRequest = true;
-                fb.auth.createUserWithEmailAndPassword(this.signupForm.email, this.signupForm.password).then(user => {
-                    this.$store.commit('setCurrentUser', user.user)
-                    // create user obj
-                    fb.usersCollection.doc(user.user.uid).set({
-                        name: this.signupForm.name,
-                        title: this.signupForm.title,
-                        user_description: this.signupForm.user_description
-                    }).then(() => {
-                        this.$store.dispatch('fetchUserProfile')
-                        this.performingRequest = false;
-                        this.$router.push('/home')
-                    }).catch(err => {
-                        console.log(err)
-                        this.performingRequest = false;
-                        this.errorMsg = err.message
-                    })
+                fb.usersCollection.where('name', '==', this.signupForm.name).get().then(docs => {
+                       if(docs.docs.length){
+                            this.performingRequest = false;
+                            this.errorMsg = "This name is taken"
+                       } else {
+                            fb.auth.createUserWithEmailAndPassword(this.signupForm.email, this.signupForm.password).then(user => {
+                                this.$store.commit('setCurrentUser', user.user)
+                                // create user obj
+                                fb.usersCollection.doc(user.user.uid).set({
+                                    name: this.signupForm.name,
+                                    title: this.signupForm.title,
+                                    user_description: this.signupForm.user_description
+                                }).then(() => {
+                                    this.$store.dispatch('fetchUserProfile')
+                                    this.performingRequest = false;
+                                    this.$router.push('/home')
+                                }).catch(err => {
+                                    //console.log(err)
+                                    this.performingRequest = false;
+                                    this.errorMsg = err.message
+                                })
+                            }).catch(err => {
+                                console.log(err)
+                                this.performingRequest = false
+                                this.errorMsg = err.message
+                            })
+                       }
                 }).catch(err => {
-                    console.log(err)
-                    this.performingRequest = false
-                    this.errorMsg = err.message
+                       // console.log(err)
+                        this.performingRequest = false;
+                        this.errorMsg = "This username is taken"
+                      //  this.errorMsg = err.message
                 })
+
             },
             resetPassword() {
                 this.performingRequest = true

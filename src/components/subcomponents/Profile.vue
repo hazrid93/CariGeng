@@ -256,7 +256,8 @@
                     userId: this.currentUser.uid,
                     userName: this.userProfile.name,
                     comments: 0,
-                    likes: 0
+                    likes: 0,
+                    commentOn: this.currentUser.uid
                 }).then(ref => {
                     this.post.content = ''
                 }).catch(err => {

@@ -1,4 +1,17 @@
 {
-  "indexes": [],
+  "indexes": [
+   {
+      "collectionId": "posts",
+      "fields": [
+        {
+          "fieldPath": "commentOn",
+          "mode": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdOn",
+          "mode": "DESCENDING"
+        }
+      ]
+    }],
   "fieldOverrides": []
 }
