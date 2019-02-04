@@ -1,24 +1,23 @@
 <template>
     <div>
-        <v-container>
+        <v-container fluid>
             <!-- justify-content (horizontal), align-items (vertical) 
                 Note:cannot control xs6 sizes if use column layout -->
             <v-layout justify-center row wrap>
-                <v-flex xs6 mb-4>
-                    <div class="v-card-profile">
+                <v-layout justify-center align-end row wrap>
+                <v-flex xs12 sm12 md4 pa-2>
+                    <div style="background-color: white ;box-shadow: 0px 2px 3px grey;  margin-top: 65px; margin-bottom: 0px; border-radius: 7px " class="v-card-profile">
                         <v-avatar
-                            slot="offset"
                             class="mx-auto d-block"
                             size="130"
+                            style="top: -65px"
                         >
-                            <img
-                            src="https://demos.creative-tim.com/vue-material-dashboard/img/marc.aba54d65.jpg"
-                            >
+                            <img :src="user_image_url">
                         </v-avatar>
-                        <v-card-text class="text-xs-center">
-                            <h6 class="category text-gray font-weight-thin mb-3">CEO / CO-FOUNDER</h6>
-                            <h4 class="card-title font-weight-light">Alec Thompson</h4>
-                            <p class="card-description font-weight-light">Don't be scared of the truth because we need to restart the human foundation in truth And I love you like Kanye loves Kanye I love Rick Owens’ bed design but the back is...</p>
+                        <v-card-text class="text-xs-center" style="position: relative; top: -65px">
+                            <h5 class="category text-gray font-weight mb-3">{{ userProfile.title }}</h5>
+                            <h4 class="card-title font-weight-light">{{ userProfile.name }}</h4>
+                            <p class="card-description font-weight-light" style="padding-top: 10px">{{ userProfile.user_description | trimUserDescription }}</p>
                             <v-btn
                             color="success"
                             round
@@ -27,9 +26,8 @@
                         </v-card-text>
                     </div>
                     <div>
-                        <p class="font-weight-black text-sm-center title">Name: {{ userProfile.name }}</p>
-                        <p class="font-weight-black text-sm-center title">Title: {{ userProfile.title }}</p>
-                        <div class="create-post">
+                        
+                        <!--<div class="create-post">
                             <v-form @submit.prevent>
                                 <v-text-field
                                     label="Create a post"
@@ -40,14 +38,50 @@
                                     <v-btn @click="createPost" color="primary" round outline dark :disabled="post.content == ''">Post</v-btn>
                                 </div>
                             </v-form>
-                        </div>
+                        </div>-->
                     </div>
+                   
                 </v-flex>
+                <v-flex xs12 sm12 md4 pa-2>
+                     <!-- using color in vuetify https://vuetifyjs.com/en/framework/colors#classes -->
+                    <v-card style="border-radius: 7px; margin-top: 15px" color="grey darken-4" class="white--text">
+                        <v-card-title primary-title class="pa-0">
+                            <div style="background-color: white; border-radius: 7px; top: -15px; position: relative; margin-left: 15px; margin-right: 15px">
+                                <v-icon style="color:red ; height: 70px; width:70px; font-size: 50px">whatshot</v-icon> 
+                            </div>
+                            <div class="headline">{{ numberOfUserEvent }} Event's Created</div>
+                         
+                        </v-card-title>
+                    </v-card>
+                </v-flex>
+                </v-layout>
+
 
                 <!-- for comments section -->
-                <v-flex xs12 mb-4>
-                    <v-card>
-                    <v-list three-line>
+                <v-flex xs12 sm12 md8 pa-2>
+                    <v-card style="border-radius: 7px">
+                    <v-list three-line pa--0>
+                        <v-subheader>
+                            <v-form @submit.prevent style="width: 100%">
+                                <v-layout justify-center align-center>
+                                    <v-flex xs6>
+                                        <v-text-field
+                                            label="Create a post"
+                                            v-model.trim="post.content"
+                                            type="text"
+                                            single-line
+                                        >
+                                        </v-text-field> 
+                                    </v-flex>
+                                    <v-flex xs6>
+                                        <v-btn @click="createPost" color="primary" round outline dark :disabled="post.content == ''">Post</v-btn>      
+                                    </v-flex>
+
+                                </v-layout>
+                            </v-form>
+
+
+                        </v-subheader>
                         <!--
                             <v-subheader
                                 v-if="hiddenPosts.length" 
@@ -64,8 +98,8 @@
                             <template v-for="(post, index) in posts">
                                 <v-list-tile :key="post.title" avatar ripple dark>   
                                     
-                                    <v-list-tile-avatar tile>
-                                    <img style="border-radius: 7px" :src="user_image_url">
+                                    <v-list-tile-avatar size="45px">
+                                    <img :src="user_image_url">
                                     </v-list-tile-avatar>
                     
                                     <v-list-tile-content>
@@ -174,16 +208,18 @@
                 fullPost: {},
                 postComments: [],
                 selected: [],
-                user_image_url: '',
+                //display base64 image *http://probablyprogramming.com/2009/03/15/the-tiniest-gif-ever
+                user_image_url: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=',
                 delete_dialog: false,
-                delete_post: {}
+                delete_post: {},
+                numberOfUserEvent: 0
             }
         },
         computed: {
             //use mapState to get access to all state properties or
             //use mapGetters to get all the getters specified in store.js
             //will use mapState for now
-            ...mapState(['userProfile','currentUser','posts','hiddenPosts'])
+            ...mapState(['userProfile','currentUser','posts','hiddenPosts','events'])
 
             /* mapGetter example
 
@@ -335,7 +371,19 @@
                     console.log(err)  
                 })
                 this.delete_dialog = false
-            }
+            },
+            getUserEvent() {
+                //this.currentUser.uid
+                   fb.eventsCollection.where("userId", "==", this.currentUser.uid).get().then(querySnapshot => {
+                    let numberOfUserEvent = 0
+
+                    querySnapshot.forEach(doc => {
+                        numberOfUserEvent = numberOfUserEvent + 1
+                    })
+                   
+                    this.numberOfUserEvent = numberOfUserEvent 
+                    })
+            },
         },
         filters: {
             formatDate(val) {
@@ -346,10 +394,17 @@
             trimLength(val) {
                 if (val.length < 100) { return val }
                 return `${val.substring(0, 100)}...`
+            },
+            trimUserDescription(val) {
+                if (val.length < 500) { return val }
+                return `${val.substring(0, 100)}...`
             }
         },
         created() {
             this.getUserImage()
+        },
+        mounted() {
+            this.getUserEvent() 
         }
     }
 </script>

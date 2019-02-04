@@ -1,8 +1,8 @@
 <template>
     <div>
-        <v-container>
-            <v-layout justify-center align-center column fill-height>
-                <v-flex xs8 pr-2>
+        <v-container fluid>
+            <v-layout justify-center align-center row wrap fill-height>
+                <v-flex xs10 sm10 md4 pr-2>
                     <h5 class=" headline font-weight-black">Settings</h5>
                     <p class="font-weight-light">Update your user profile</p>
 
@@ -30,9 +30,7 @@
                             min-height="250px"
                             max-height="250px"
                             style="margin-left: 0; margin-right:auto; margin-top:10px; margin-bottom:10px;border-radius: 7px"
-                            contain
-
-
+                            
                         > </v-img>
 
                         <h6 class="title font-weight-light" style="text-decoration: underline">Name</h6>
@@ -44,6 +42,7 @@
                             id="name"
                             style="margin-bottom:10px; padding: 0"
                             single-line
+                            
                         ></v-text-field>
                          
                         <h6 class="title font-weight-light" style="text-decoration: underline">Title</h6>
@@ -81,7 +80,7 @@
                 name: '',
                 title: '',
                 image_file: null,
-                user_image_url: '',
+                user_image_url: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=',
                 showSuccess: false
             }
         },

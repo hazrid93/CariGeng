@@ -53,6 +53,7 @@
 
                                     <v-text-field placeholder="Name" clearable outline v-model.trim="signupForm.name" label="Name" id="name" required ></v-text-field>
                                     <v-text-field placeholder="Title" clearable outline v-model.trim="signupForm.title" label="Title" id="title" required ></v-text-field>
+                                    <v-text-field placeholder="Description" clearable outline v-model.trim="signupForm.user_description" label="Description" id="description" required ></v-text-field>
                                     <v-text-field placeholder="Email" clearable outline v-model.trim="signupForm.email" label="Email" id="email2" required ></v-text-field>
                                     <v-text-field placeholder="Min 6 characters" clearable outline v-model.trim="signupForm.password" type="password" label="Password" id="password2" required ></v-text-field>
                                     <v-btn @click="signup">Sign Up</v-btn>
@@ -112,7 +113,8 @@
                     name: '',
                     title: '',
                     email: '',
-                    password: ''
+                    password: '',
+                    user_description: ''
                 },
                 passwordForm: {
                     email: ''
@@ -162,7 +164,8 @@
                     // create user obj
                     fb.usersCollection.doc(user.user.uid).set({
                         name: this.signupForm.name,
-                        title: this.signupForm.title
+                        title: this.signupForm.title,
+                        user_description: this.signupForm.user_description
                     }).then(() => {
                         this.$store.dispatch('fetchUserProfile')
                         this.performingRequest = false;
