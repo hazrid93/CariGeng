@@ -119,22 +119,32 @@ export const store =  new Vuex.Store({
               console.log(err)
           })
         },
+        fetchUserProfilePromise({ commit, state }) {
+          return new Promise((resolve, reject) => {
+            fb.usersCollection.doc(state.currentUser.uid).get().then(res => {
+              commit('setUserProfile', res.data())
+              resolve()
+            }).catch(err => {
+                console.log(err)
+                reject()
+            })
+          })
+          
+        },
         fetchUserProfileImage({ commit, state }, profileState) {
           let userId = state.currentUser.uid
           //console.log(userId)
           if(!profileState.actualUser){
             userId = profileState.userId
           }
-          console.log(userId)
           return new Promise((resolve, reject) => {
             fb.usersCollection.doc(userId).get().then(res => {
               commit('setuserProfileImage', res.data().user_image)
-              console.log(res.data().user_image)
               resolve()
               // console.log(res.data().user_image)
               }).catch(err => {
-                  reject()
                   console.log(err)
+                  reject()
               })
           })
 

@@ -123,8 +123,8 @@
             getUserImage() {
                 //use promise to watch store to finish update the user profile
                 // fetchUserProfileImage will return a promise
-                this.$store.dispatch('fetchUserProfileImage').then(() => {
-                        var user_image_name = this.$store.getters.getUserProfile.user_image
+                this.$store.dispatch('fetchUserProfileImage', { actualUser: true }).then(() => {
+                        var user_image_name = this.$store.getters.getUserProfileImage
                         fb.storage.ref().child(`user_profile_image/${user_image_name}`).getDownloadURL().then((url) => {
                         this.user_image_url = url
                     }).catch(function(error) {

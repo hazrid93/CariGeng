@@ -18,6 +18,7 @@
                             <h5 class="category text-gray font-weight mb-3">{{ userProfile.title }}</h5>
                             <h4 class="card-title font-weight-light">{{ userProfile.name }}</h4>
                             <p class="card-description font-weight-light" style="padding-top: 10px">{{ userProfile.user_description | trimUserDescription }}</p>
+                         
                             <v-btn
                             color="success"
                             round
@@ -368,7 +369,6 @@
                         });
                     })
                 } else {
-                    console.log(this.profileUID)
                      this.$store.dispatch('fetchUserProfileImage', { actualUser: false, userId: this.profileUID }).then(() => {
                             var user_image_name = this.$store.getters.getUserProfileImage
                             fb.storage.ref().child(`user_profile_image/${user_image_name}`).getDownloadURL().then((url) => {
@@ -423,39 +423,48 @@
                 return `${val.substring(0, 60)}...`
             },
             trimUserDescription(val) {
-                if (val.length < 500) { return val }
-                return `${val.substring(0, 100)}...`
+                if (val.length < 400) { return val }
+                return `${val.substring(0, 400)}...`
             }
         },
         created() {
             this.profileUID = this.currentUser.uid
 
-            fb.usersCollection.where('name', '==', this.$route.params.username).get().then(docs => {
-               if(docs.docs.length){
-                   
-                    if(this.currentUser.uid == docs.docs[0].id && this.userProfile.name == this.$route.params.username){
-                        this.isUserProfile = true
-                        this.getUserImage()
-                        this.getUserEvent() 
+            this.$store.dispatch('fetchUserProfilePromise').then(() => {
+               let userUsername =  this.userProfile.name 
+
+               if(this.$route.params.username){
+                    userUsername = this.$route.params.username
+                }
+
+
+                fb.usersCollection.where('name', '==', userUsername).get().then(docs => {
+                    if(docs.docs.length){
+                        
+                            if(this.currentUser.uid == docs.docs[0].id && this.userProfile.name == userUsername){
+                                this.isUserProfile = true
+                                this.getUserImage()
+                                this.getUserEvent() 
+                            } else {
+                                this.isUserProfile = false
+                                //console.log(docs.docs[0].id)
+                                this.profileUID = docs.docs[0].id
+                                this.getUserImage()
+                                this.getUserEvent() 
+                                //this.$router.push('/home')
+                            }
                     } else {
-                        this.isUserProfile = false
-                        //console.log(docs.docs[0].id)
-                        this.profileUID = docs.docs[0].id
-                        this.getUserImage()
-                        this.getUserEvent() 
-                        //this.$router.push('/home')
+                            this.isUserProfile = false
+                            // USER DOESNT EXIST
+                            this.$router.push('/home')
                     }
-               } else {
-                    this.isUserProfile = false
-                    // USER DOESNT EXIST
-                    this.$router.push('/home')
-               }
+                })
+            }).catch(err => {
+                
             })
+
+            
          
-        },
-        mounted() {
-         //   this.getUserImage()
-          //  this.getUserEvent() 
         }
     }
 </script>
