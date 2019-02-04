@@ -51,6 +51,11 @@ const router = new Router({
           component: Profile
         },
         {
+          path: 'profile/:username',
+          name: 'Profile',
+          component: Profile
+        },
+        {
           path: 'settings',
           name: 'Settings',
           component: Settings

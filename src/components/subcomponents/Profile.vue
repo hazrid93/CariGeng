@@ -212,7 +212,8 @@
                 user_image_url: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=',
                 delete_dialog: false,
                 delete_post: {},
-                numberOfUserEvent: 0
+                numberOfUserEvent: 0,
+                isUserProfile: false
             }
         },
         computed: {
@@ -401,8 +402,28 @@
                 return `${val.substring(0, 100)}...`
             }
         },
+        beforeCreate(){
+            //console.log( this.$route.params.username)
+            //this.currentUser.uid
+            //this.userProfile.name
+            fb.usersCollection.where('name', '==', this.$route.params.username).get().then(docs => {
+               if(docs.docs.length){
+                   
+                    if(this.currentUser.uid == docs.docs[0].id && this.userProfile.name == this.$route.params.username){
+                        this.isUserProfile = true
+                    } else {
+                        this.isUserProfile = false
+                        this.$router.push('/home')
+                    }
+               } else {
+                    this.isUserProfile = false
+                    this.$router.push('/home')
+               }
+            })
+        },
         created() {
             this.getUserImage()
+            
         },
         mounted() {
             this.getUserEvent() 
