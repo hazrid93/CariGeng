@@ -46,17 +46,17 @@
                                     </v-flex>
                                 </v-layout>
                             </v-form>
-                            <v-form v-if="!showLoginForm && !showForgotPassword" @submit.prevent>
+                            <v-form ref="signUpForm" v-model="signUpValid" v-if="!showLoginForm && !showForgotPassword" @submit.prevent>
                                 <v-layout justify-center align-center row wrap>
                                     <v-flex xs8 md5 text-xs-center>
                                     <h3>Get Started</h3>
 
-                                    <v-text-field placeholder="Name" clearable outline v-model.trim="signupForm.name" label="Name" id="name" required ></v-text-field>
+                                    <v-text-field autofocus placeholder="Name" clearable outline v-model.trim="signupForm.name" :rules="nameRules" label="Name" id="name" required ></v-text-field>
                                     <v-text-field placeholder="Title" clearable outline v-model.trim="signupForm.title" label="Title" id="title" required ></v-text-field>
                                     <v-text-field placeholder="Description" clearable outline v-model.trim="signupForm.user_description" label="Description" id="description" required ></v-text-field>
-                                    <v-text-field placeholder="Email" clearable outline v-model.trim="signupForm.email" label="Email" id="email2" required ></v-text-field>
-                                    <v-text-field placeholder="Min 6 characters" clearable outline v-model.trim="signupForm.password" type="password" label="Password" id="password2" required ></v-text-field>
-                                    <v-btn @click="signup">Sign Up</v-btn>
+                                    <v-text-field placeholder="Email" clearable outline v-model.trim="signupForm.email" :rules="emailRules" label="Email" id="email2" required ></v-text-field>
+                                    <v-text-field placeholder="Min 6 characters" clearable outline v-model.trim="signupForm.password" type="password" :rules="passRules" label="Password" id="password2" required ></v-text-field>
+                                    <v-btn :disabled="!signUpValid" @click="signup">Sign Up</v-btn>
   
                                     <div class="extras">
                                         <a @click="toggleForm" style="padding: 5px">Back to Log In</a>
@@ -123,10 +123,32 @@
                 showForgotPassword: false,
                 passwordResetSuccess: false,
                 performingRequest: false,
-                errorMsg: ''
+                errorMsg: '',
+                nameRules: [
+                    v => !!v || 'Name is required',
+                    v => (v && v.length <= 10) || 'Name must be less than 10 characters',
+                    v => (v || '').indexOf(' ') < 0 || 'No spaces are allowed'
+                ],
+                emailRules: [
+                    v => !!v || 'E-mail is required',
+                    v => /.+@.+/.test(v) || 'E-mail must be valid'
+                ],
+                passRules: [
+                    //single line arrow operator that return left or right (logical OR)
+                    // !!v will change a falsy/truthy type to boolean form
+                    v => !!v || 'Password is required',
+                    v => (v && v.length >= 6) || 'Password must be 6 character or more',
+                    v => (v || '').indexOf(' ') < 0 || 'No spaces are allowed'
+                ],
+                signUpValid: false
             }
         },
         methods: {
+            validate() {
+                if (this.$refs.signUpForm.validate()) {
+                    this.snackbar = true
+                }
+            },
             toggleForm() {
                 this.errorMsg = ''
                 this.showLoginForm = !this.showLoginForm
@@ -158,41 +180,60 @@
                     this.errMsg = err.message
                 })
             },
+            checkSignUpField(){
+                if(!this.signupForm.name || this.signupForm.name.length === 0 || this.signupForm.name.length > 10 || this.signupForm.name.indexOf(' ') > 0){
+                   return false
+                } else if(!this.signupForm.password || this.signupForm.password.length === 0 || this.signupForm.password.length < 6 || this.signupForm.password.indexOf(' ') > 0){
+                    return false
+                } else if(!this.signupForm.email || this.signupForm.email.length === 0 || this.signupForm.email.indexOf(' ') > 0){
+                    return false
+                } else {
+                    return true
+                }
+            },
             signup() {
                 this.performingRequest = true;
-                fb.usersCollection.where('name', '==', this.signupForm.name).get().then(docs => {
-                       if(docs.docs.length){
-                            this.performingRequest = false;
-                            this.errorMsg = "This name is taken"
-                       } else {
-                            fb.auth.createUserWithEmailAndPassword(this.signupForm.email, this.signupForm.password).then(user => {
-                                this.$store.commit('setCurrentUser', user.user)
-                                // create user obj
-                                fb.usersCollection.doc(user.user.uid).set({
-                                    name: this.signupForm.name,
-                                    title: this.signupForm.title,
-                                    user_description: this.signupForm.user_description
-                                }).then(() => {
-                                    this.$store.dispatch('fetchUserProfile')
-                                    this.performingRequest = false;
-                                    this.$router.push('/home')
+                if(this.checkSignUpField()){
+                    fb.usersCollection.where('name', '==', this.signupForm.name).get().then(docs => {
+                        //temporary measure to ensure username is unique through frontend
+                        //for using backend to valide with function refer https://bigcodenerd.org/enforce-cloud-firestore-unique-field-values/
+                        if(docs.docs.length){
+                                this.performingRequest = false;
+                                this.errorMsg = "This name is taken"
+                        } else {
+                                fb.auth.createUserWithEmailAndPassword(this.signupForm.email, this.signupForm.password).then(user => {
+                                    this.$store.commit('setCurrentUser', user.user)
+                                    // create user obj
+                                    fb.usersCollection.doc(user.user.uid).set({
+                                        name: this.signupForm.name,
+                                        title: this.signupForm.title,
+                                        user_description: this.signupForm.user_description
+                                    }).then(() => {
+                                        this.$store.dispatch('fetchUserProfile')
+                                        this.performingRequest = false;
+                                        this.$router.push('/home')
+                                    }).catch(err => {
+                                        //console.log(err)
+                                        this.performingRequest = false;
+                                        this.errorMsg = err.message
+                                    })
                                 }).catch(err => {
                                     //console.log(err)
-                                    this.performingRequest = false;
+                                    this.performingRequest = false
                                     this.errorMsg = err.message
                                 })
-                            }).catch(err => {
-                                console.log(err)
-                                this.performingRequest = false
-                                this.errorMsg = err.message
-                            })
-                       }
-                }).catch(err => {
-                       // console.log(err)
-                        this.performingRequest = false;
-                        this.errorMsg = "This username is taken"
-                      //  this.errorMsg = err.message
-                })
+                        }
+                    }).catch(err => {
+                        // console.log(err)
+                            this.performingRequest = false;
+                            this.errorMsg = "This username is taken"
+                        //  this.errorMsg = err.message
+                    })
+
+                } else {
+                    console.log("form error")
+                    this.performingRequest = false;
+                }
 
             },
             resetPassword() {

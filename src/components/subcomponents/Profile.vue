@@ -393,8 +393,8 @@
                 return moment(date).fromNow()
             },
             trimLength(val) {
-                if (val.length < 100) { return val }
-                return `${val.substring(0, 100)}...`
+                if (val.length < 60) { return val }
+                return `${val.substring(0, 60)}...`
             },
             trimUserDescription(val) {
                 if (val.length < 500) { return val }
