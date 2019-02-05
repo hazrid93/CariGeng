@@ -72,7 +72,8 @@ export const store =  new Vuex.Store({
         userProfileImage: '',
         posts: [],
         hiddenPosts: [],
-        events: []
+        events: [],
+        visitingPosts: []
 
     },
     //mutations are synhcronous
@@ -105,9 +106,26 @@ export const store =  new Vuex.Store({
         setuserProfileImage(state, val) {
           state.userProfileImage = val
         },
+        setVisitingPosts(state, val) {
+          state.visitingPosts = val
+        },
     },
     //actions are asynchronous
     actions: {
+        fetchVisitingPosts({ commit, state }, profileState) {
+          fb.postsCollection.where("userId", "==", profileState.userId).orderBy('createdOn', 'desc').get().then(querySnapshot => {
+            let visitingPostsArray = []
+
+            querySnapshot.forEach(doc => {
+                let visitingPost = doc.data()
+                visitingPost.id = doc.id
+                visitingPostsArray.push(visitingPost)
+            
+            })
+      
+            store.commit('setVisitingPosts', visitingPostsArray)
+          })
+        },
         setThemeInitial({commit}) {
             commit('changeTheme');
             //console.log("vuex called");
@@ -120,15 +138,29 @@ export const store =  new Vuex.Store({
           })
         },
         fetchUserProfilePromise({ commit, state }) {
+
+          // using interval to wait for userProfile to be updated when called from Profile.vue
+          return new Promise((resolve, reject) => {
+            let myInterval = setInterval(myTimer, 50);
+              function myTimer(){
+                if(state.userProfile.name){
+                  clearInterval(myInterval)
+                  resolve()
+                } else {
+                }
+              }
+          })
+         
+          /*
           return new Promise((resolve, reject) => {
             fb.usersCollection.doc(state.currentUser.uid).get().then(res => {
               commit('setUserProfile', res.data())
               resolve()
             }).catch(err => {
-                console.log(err)
                 reject()
             })
           })
+          */
           
         },
         fetchUserProfileImage({ commit, state }, profileState) {

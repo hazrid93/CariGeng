@@ -1,17 +1,31 @@
 {
   "indexes": [
-   {
-      "collectionId": "posts",
-      "fields": [
-        {
-          "fieldPath": "commentOn",
-          "mode": "ASCENDING"
-        },
-        {
-          "fieldPath": "createdOn",
-          "mode": "DESCENDING"
-        }
-      ]
-    }],
+	   {
+		  "collectionId": "posts",
+		  "fields": [
+			{
+			  "fieldPath": "commentOn",
+			  "mode": "ASCENDING"
+			},
+			{
+			  "fieldPath": "createdOn",
+			  "mode": "DESCENDING"
+			}
+		  ]
+		},
+		{
+		  "collectionId": "posts",
+		  "fields": [
+			{
+			  "fieldPath": "userId",
+			  "mode": "ASCENDING"
+			},
+			{
+			  "fieldPath": "createdOn",
+			  "mode": "DESCENDING"
+			}
+		  ]
+		}
+	],
   "fieldOverrides": []
 }

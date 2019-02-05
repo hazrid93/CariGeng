@@ -46,12 +46,9 @@ const router = new Router({
           component: Tracks
         },
         {
-          path: 'profile',
-          name: 'Profile',
-          component: Profile
-        },
-        {
-          path: 'profile/:username',
+          //with '?' now the route parameter 'username' is optional, means can go to /../profile url and its still valid
+          //dont have to define another path just for 'profile' https://github.com/vuejs/vue-router/issues/235#issuecomment-245447122
+          path: 'profile/:username?',
           name: 'Profile',
           component: Profile
         },

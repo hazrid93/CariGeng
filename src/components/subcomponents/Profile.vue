@@ -62,6 +62,7 @@
                 <v-flex xs12 sm12 md8 pa-2>
                     <v-card style="border-radius: 7px">
                     <v-list three-line pa--0>
+                        <div v-if="isUserProfile">
                         <v-subheader>
                             <v-form @submit.prevent style="width: 100%">
                                 <v-layout justify-center align-center>
@@ -95,36 +96,72 @@
                                 </p>                                
                             </v-subheader> -->
                         <v-divider></v-divider>
-                        <div v-if="posts.length">
-                            <template v-for="(post, index) in posts">
-                                <v-list-tile :key="post.title" avatar ripple dark>   
-                                    
-                                    <v-list-tile-avatar size="45px">
-                                    <img :src="user_image_url">
-                                    </v-list-tile-avatar>
-                    
-                                    <v-list-tile-content>
-                                        <v-list-tile-title>{{ post.userName }}</v-list-tile-title>
-                                        <v-list-tile-sub-title>{{ post.content | trimLength }}</v-list-tile-sub-title>
-                                        <v-list-tile-sub-title ><a @click="openCommentModal(post)">comments {{ post.comments }}</a> <a @click="viewPost(post)">view full post</a> </v-list-tile-sub-title>
-                                    </v-list-tile-content>
-                                    <v-list-tile-action>
-                                        <v-icon style="color:red" @click="delete_post = post ; delete_dialog = true">close</v-icon> 
-                                        <v-list-tile-action-text>{{ post.createdOn | formatDate }}</v-list-tile-action-text>
-                                        <v-list-tile-action-text>{{ post.likes }} likes</v-list-tile-action-text>
-                                        <v-icon v-if="selected.indexOf(index) < 0" @click="likePost(post.id, post.likes); toggle(index)" color="grey lighten-1">star_border</v-icon>
-                                        <v-icon v-else color="yellow darken-2">star</v-icon>
-                                    </v-list-tile-action>
-                                </v-list-tile>
-                                <v-divider
-                                    v-if="index + 1 < posts.length"
-                                    :key="index"
-                                ></v-divider>
-                            </template>
                         </div>
+                        <div v-if="isUserProfile">
+                            <div v-if="posts.length">
+                                <template v-for="(post, index) in posts">
+                                    <v-list-tile :key="post.title" avatar ripple dark>   
+                                        
+                                        <v-list-tile-avatar size="45px">
+                                        <img :src="user_image_url">
+                                        </v-list-tile-avatar>
+                        
+                                        <v-list-tile-content>
+                                            <v-list-tile-title>{{ post.userName }}</v-list-tile-title>
+                                            <v-list-tile-sub-title>{{ post.content | trimLength }}</v-list-tile-sub-title>
+                                            <v-list-tile-sub-title ><a @click="openCommentModal(post)">comments {{ post.comments }}</a> <a @click="viewPost(post)">view full post</a> </v-list-tile-sub-title>
+                                        </v-list-tile-content>
+                                        <v-list-tile-action>
+                                            <v-icon style="color:red" @click="delete_post = post ; delete_dialog = true">close</v-icon> 
+                                            <v-list-tile-action-text>{{ post.createdOn | formatDate }}</v-list-tile-action-text>
+                                            <v-list-tile-action-text>{{ post.likes }} likes</v-list-tile-action-text>
+                                            <v-icon v-if="selected.indexOf(index) < 0" @click="likePost(post.id, post.likes); toggle(index)" color="grey lighten-1">star_border</v-icon>
+                                            <v-icon v-else color="yellow darken-2">star</v-icon>
+                                        </v-list-tile-action>
+                                    </v-list-tile>
+                                    <v-divider
+                                        v-if="index + 1 < posts.length"
+                                        :key="index"
+                                    ></v-divider>
+                                </template>
+                            </div>
+                            <div v-else>
+                                <p>There are currently no posts</p>
+                            </div>
+                        </div>
+                        <!-- when viewing other user -->
                         <div v-else>
-                            <p>There are currently no posts</p>
+                            <div v-if="visitingPosts.length">
+                                <template v-for="(post, index) in visitingPosts">
+                                    <v-list-tile :key="post.title" avatar ripple dark>   
+                                        
+                                        <v-list-tile-avatar size="45px">
+                                        <img :src="user_image_url">
+                                        </v-list-tile-avatar>
+                        
+                                        <v-list-tile-content>
+                                            <v-list-tile-title>{{ post.userName }}</v-list-tile-title>
+                                            <v-list-tile-sub-title>{{ post.content | trimLength }}</v-list-tile-sub-title>
+                                            <v-list-tile-sub-title ><a @click="openCommentModal(post)">comments {{ post.comments }}</a> <a @click="viewPost(post)">view full post</a> </v-list-tile-sub-title>
+                                        </v-list-tile-content>
+                                        <v-list-tile-action>
+                                            <v-list-tile-action-text>{{ post.createdOn | formatDate }}</v-list-tile-action-text>
+                                            <v-list-tile-action-text>{{ post.likes }} likes</v-list-tile-action-text>
+                                            <v-icon v-if="selected.indexOf(index) < 0" @click="likePost(post.id, post.likes); toggle(index)" color="grey lighten-1">star_border</v-icon>
+                                            <v-icon v-else color="yellow darken-2">star</v-icon>
+                                        </v-list-tile-action>
+                                    </v-list-tile>
+                                    <v-divider
+                                        v-if="index + 1 < visitingPosts.length"
+                                        :key="index"
+                                    ></v-divider>
+                                </template>
+                            </div>
+                            <div v-else>
+                                <p>There are currently no posts</p>
+                            </div>
                         </div>
+                        
                     </v-list>
                     <!--delete confirmation part -->
                     <v-dialog v-model="delete_dialog" persistent max-width="290">
@@ -222,7 +259,7 @@
             //use mapState to get access to all state properties or
             //use mapGetters to get all the getters specified in store.js
             //will use mapState for now
-            ...mapState(['userProfile','currentUser','posts','hiddenPosts','events'])
+            ...mapState(['userProfile','currentUser','posts','hiddenPosts','events','visitingPosts'])
 
             /* mapGetter example
 
@@ -411,6 +448,11 @@
                     })
                 }
             },
+            getVisitingPosts(){
+               
+                this.$store.dispatch('fetchVisitingPosts', { userId: this.profileUID })
+                
+            }
         },
         filters: {
             formatDate(val) {
@@ -429,7 +471,7 @@
         },
         created() {
             this.profileUID = this.currentUser.uid
-
+          
             this.$store.dispatch('fetchUserProfilePromise').then(() => {
                let userUsername =  this.userProfile.name 
 
@@ -451,6 +493,7 @@
                                 this.profileUID = docs.docs[0].id
                                 this.getUserImage()
                                 this.getUserEvent() 
+                                this.getVisitingPosts()
                                 //this.$router.push('/home')
                             }
                     } else {
@@ -460,7 +503,9 @@
                     }
                 })
             }).catch(err => {
-                
+                this.isUserProfile = false
+                // USER DOESNT EXIST
+                this.$router.push('/home')
             })
 
             

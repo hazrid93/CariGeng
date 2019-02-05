@@ -95,8 +95,10 @@
                 </v-toolbar-items>
             </v-toolbar>
             <v-content>
-               <!-- <p>{{ currentUser }}</p> -->
-                <router-view/>
+                <!-- https://router.vuejs.org/api/#route-object-properties 
+                     https://stackoverflow.com/questions/52847979/what-is-router-view-key-route-fullpath
+                -->
+                <router-view :key="$route.fullPath"></router-view>
             </v-content>
             <v-footer color="black" app>
             <span class="white--text">&copy; 2017</span>
