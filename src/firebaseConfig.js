@@ -1,5 +1,10 @@
-import firebase from 'firebase'
+import firebase from 'firebase/app'
+//need to use firebase/app to avoid development mode log in console.
+//https://github.com/firebase/firebase-js-sdk/issues/848
 import 'firebase/firestore'
+import 'firebase/storage'
+import 'firebase/auth'
+import 'firebase/messaging'
 
 // firebase init goes here
 const config = {

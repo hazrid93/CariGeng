@@ -14,17 +14,27 @@
                         >
                             <img :src="user_image_url">
                         </v-avatar>
-                        <v-card-text class="text-xs-center" style="position: relative; top: -65px">
-                            <h5 class="category text-gray font-weight mb-3">{{ userProfile.title }}</h5>
-                            <h4 class="card-title font-weight-light">{{ userProfile.name }}</h4>
-                            <p class="card-description font-weight-light" style="padding-top: 10px">{{ userProfile.user_description | trimUserDescription }}</p>
-                         
-                            <v-btn
-                            color="success"
-                            round
-                            class="font-weight-light"
-                            >Follow</v-btn>
-                        </v-card-text>
+                        <div v-if="isUserProfile">
+                            <v-card-text class="text-xs-center" style="position: relative; top: -65px">
+                                <h5 class="category text-gray font-weight mb-3">{{ userProfile.title }}</h5>
+                                <h4 class="card-title font-weight-light">{{ userProfile.name }}</h4>
+                                <p class="card-description font-weight-light" style="padding-top: 10px">{{ userProfile.user_description | trimUserDescription }}</p>
+                            
+                            </v-card-text>
+                        </div>
+                        <div v-else>
+                            <v-card-text class="text-xs-center" style="position: relative; top: -65px">
+                                <h5 class="category text-gray font-weight mb-3">{{ visitingUserProfile.title }}</h5>
+                                <h4 class="card-title font-weight-light">{{ visitingUserProfile.name }}</h4>
+                                <p class="card-description font-weight-light" style="padding-top: 10px">{{ visitingUserProfile.user_description | trimUserDescription }}</p>
+                            
+                                <v-btn
+                                color="success"
+                                round
+                                class="font-weight-light"
+                                >Follow</v-btn>
+                            </v-card-text>
+                        </div>
                     </div>
                     <div>
                         
@@ -259,7 +269,7 @@
             //use mapState to get access to all state properties or
             //use mapGetters to get all the getters specified in store.js
             //will use mapState for now
-            ...mapState(['userProfile','currentUser','posts','hiddenPosts','events','visitingPosts'])
+            ...mapState(['userProfile','currentUser','posts','hiddenPosts','events','visitingPosts','visitingUserProfile'])
 
             /* mapGetter example
 
@@ -448,10 +458,11 @@
                     })
                 }
             },
-            getVisitingPosts(){
-               
-                this.$store.dispatch('fetchVisitingPosts', { userId: this.profileUID })
-                
+            getVisitingPosts(){ 
+                this.$store.dispatch('fetchVisitingPosts', { userId: this.profileUID })   
+            },
+            getVisitingUserProfile(){
+                this.$store.dispatch('fetchVisitingUserProfile', { userId: this.profileUID }) 
             }
         },
         filters: {
@@ -479,7 +490,6 @@
                     userUsername = this.$route.params.username
                 }
 
-
                 fb.usersCollection.where('name', '==', userUsername).get().then(docs => {
                     if(docs.docs.length){
                         
@@ -493,6 +503,7 @@
                                 this.profileUID = docs.docs[0].id
                                 this.getUserImage()
                                 this.getUserEvent() 
+                                this.getVisitingUserProfile()
                                 this.getVisitingPosts()
                                 //this.$router.push('/home')
                             }

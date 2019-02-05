@@ -73,7 +73,8 @@ export const store =  new Vuex.Store({
         posts: [],
         hiddenPosts: [],
         events: [],
-        visitingPosts: []
+        visitingPosts: [],
+        visitingUserProfile: {}
 
     },
     //mutations are synhcronous
@@ -109,6 +110,9 @@ export const store =  new Vuex.Store({
         setVisitingPosts(state, val) {
           state.visitingPosts = val
         },
+        setVisitingUserProfile(state, val) {
+          state.visitingUserProfile = val
+        },
     },
     //actions are asynchronous
     actions: {
@@ -133,6 +137,13 @@ export const store =  new Vuex.Store({
         fetchUserProfile({ commit, state }) {
           fb.usersCollection.doc(state.currentUser.uid).get().then(res => {
               commit('setUserProfile', res.data())
+          }).catch(err => {
+              console.log(err)
+          })
+        },
+        fetchVisitingUserProfile({ commit, state }, profileState) {
+          fb.usersCollection.doc(profileState.userId).get().then(res => {
+              commit('setVisitingUserProfile', res.data())
           }).catch(err => {
               console.log(err)
           })
