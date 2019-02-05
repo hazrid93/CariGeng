@@ -136,7 +136,7 @@
                                 </template>
                             </div>
                             <div v-else>
-                                <p>There are currently no posts</p>
+                                <p  class="font-weight-light" style="padding: 10px; margin: 0px">There are currently no posts...</p>
                             </div>
                         </div>
                         <!-- when viewing other user -->
@@ -168,7 +168,7 @@
                                 </template>
                             </div>
                             <div v-else>
-                                <p>There are currently no posts</p>
+                                <p  class="font-weight-light" style="padding: 10px; margin: 0px">There are currently no posts...</p>
                             </div>
                         </div>
                         
@@ -193,7 +193,7 @@
 
         <!-- comment modal -->
         <transition name="fade">
-            <div v-if="showCommentModal" class="c-modal">
+            <div v-if="showCommentModal">
                 <div class="c-container">
                     <a @click="closeCommentModal">X</a>
                     <p>add a comment</p>
@@ -207,8 +207,57 @@
             </div>
         </transition>
         <!-- post modal -->
-        <transition name="fade">
-            <div v-if="showPostModal" class="p-modal">
+       <transition name="fade">
+             <v-dialog v-model="showPostModal" persistent max-width="800px">
+                 <v-card>
+                     <v-card-title class="headline">Full Post</v-card-title>
+                     <template>
+                     <v-divider></v-divider>
+                        <v-list-tile :key="fullPost.title" avatar ripple dark>   
+                            <v-list-tile-avatar size="45px">
+                            <img :src="user_image_url">
+                            </v-list-tile-avatar>
+            
+                            <v-list-tile-content>
+                                <v-list-tile-title>{{ fullPost.userName }}</v-list-tile-title>
+                                <v-list-tile-sub-title>{{ fullPost.content }}</v-list-tile-sub-title>
+                            </v-list-tile-content>
+                            <v-list-tile-action>
+                                <v-list-tile-action-text>{{ fullPost.createdOn | formatDate }}</v-list-tile-action-text>
+                                <v-list-tile-action-text>{{ fullPost.likes }} likes</v-list-tile-action-text>
+                            </v-list-tile-action>
+                        </v-list-tile>
+                        <v-divider></v-divider>
+                     </template>
+                    <!-- post comments part -->
+                    <div v-show="postComments.length">
+                        <v-card-title class="title">All Comments</v-card-title>
+                        <template v-for="(comments, index) in postComments">
+                                
+                                <v-list-tile :key="comments.title" avatar ripple dark>   
+                                    <v-list-tile-avatar size="45px">
+                                    <img :src="getCommentUserImg(comments.userId)">
+                                    </v-list-tile-avatar>
+                    
+                                    <v-list-tile-content>
+                                        <v-list-tile-title>{{ comments.userName }}</v-list-tile-title>
+                                        <v-list-tile-sub-title>{{ comments.content }}</v-list-tile-sub-title>
+                                    </v-list-tile-content>
+                                    <v-list-tile-action>
+                                        <v-list-tile-action-text>{{ comments.createdOn | formatDate }}</v-list-tile-action-text>
+                                    </v-list-tile-action>
+                                </v-list-tile>
+                                <v-divider></v-divider>
+                        </template>
+                    </div>
+
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="green darken-1" flat @click="closePostModal">Cancel</v-btn>
+                    </v-card-actions>
+                </v-card>
+
+                <!--
                 <div class="p-container">
                     <a @click="closePostModal" class="close">X</a>
                     <div class="post">
@@ -228,7 +277,8 @@
                         </div>
                     </div>
                 </div>
-            </div>
+                -->
+            </v-dialog>
         </transition>
     </div>
 
@@ -463,6 +513,35 @@
             },
             getVisitingUserProfile(){
                 this.$store.dispatch('fetchVisitingUserProfile', { userId: this.profileUID }) 
+            },
+            getCommentUserImg(commentUserId){
+                
+                /*
+                this.$store.dispatch('fetchCommentUserProfileImage', { userId: commentUserId }).then(result => {
+                    console.log(result)
+                    return result
+                }).catch(function(error) {
+                    // Handle any errors
+                    return 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
+                });
+                */
+
+                
+                let userImgUrl = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
+                fb.usersCollection.doc(commentUserId).get().then(res => {
+                    //console.log(res.data().user_image)
+                    let userImgUrl2 = res.data().user_image
+                    fb.storage.ref().child(`user_profile_image/${userImgUrl2}`).getDownloadURL().then((url) => {
+                        console.log(url)
+                        userImgUrl = url
+                    })
+                   
+                }).catch(err => {
+                    
+                })
+
+                return userImgUrl 
+            
             }
         },
         filters: {
@@ -518,9 +597,6 @@
                 // USER DOESNT EXIST
                 this.$router.push('/home')
             })
-
-            
-         
         }
     }
 </script>

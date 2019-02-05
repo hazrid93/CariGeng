@@ -192,6 +192,22 @@ export const store =  new Vuex.Store({
           })
 
         },
+        fetchCommentUserProfileImage({ commit, state }, profileState) {
+          return new Promise((resolve, reject) => {
+            fb.usersCollection.doc(profileState.userId).get().then(res => {      
+              fb.storage.ref().child(`user_profile_image/${res.data().user_image}`).getDownloadURL().then((url) => {
+                  resolve(url)
+                }).catch(err => {
+                    // Handle any errors
+                  
+              });   
+
+            }).catch(err => {
+                reject()
+            })
+          })
+
+        },
         clearData({commit}){
           commit('setCurrentUser', null)
           commit('setUserProfile', {})
