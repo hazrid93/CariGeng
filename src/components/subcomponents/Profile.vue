@@ -528,13 +528,13 @@
                 // fetchUserProfileImage will return a promise
                 if(this.isUserProfile){
                     this.$store.dispatch('fetchUserProfileImage', { actualUser: true }).then(() => {
-                            var user_image_name = this.$store.getters.getUserProfileImage
-                            fb.storage.ref().child(`user_profile_image/${user_image_name}`).getDownloadURL().then((url) => {
-                            this.user_image_url = url
+                            //var user_image_name = this.$store.getters.getUserProfileImage
+                            //fb.storage.ref().child(`user_profile_image/${user_image_name}`).getDownloadURL().then((url) => {
+                            this.user_image_url = this.userProfileImageURL
                         }).catch(function(error) {
                             // Handle any errors
                         });
-                    })
+                    
                 } else {
                     
                     this.backup_actual_user_image = ''
