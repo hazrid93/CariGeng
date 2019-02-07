@@ -492,7 +492,7 @@
                 })
             },
             viewPost(post) {
-                fb.commentsCollection.where('postId', '==', post.id).orderBy('createdOn', 'desc').get().then(docs => {
+                fb.commentsCollection.where('postId', '==', post.id).get().then(docs => {
                     let commentsArray = []
 
                     docs.forEach(doc => {
@@ -500,7 +500,7 @@
                         comment.id = doc.id
                         commentsArray.push(comment)
                     })
-                    console.log(commentsArray)
+
                     this.postComments = commentsArray
                   
                     this.fullPost = post
@@ -536,7 +536,6 @@
                         });
                     })
                 } else {
-                    
                     this.backup_actual_user_image = ''
                     
                     this.$store.dispatch('fetchUserProfileImage', { actualUser: true }).then(() => {
@@ -544,13 +543,13 @@
                          //   console.log(user_image_name)
                          //   fb.storage.ref().child(`user_profile_image/${user_image_name}`).getDownloadURL().then((url) => {
                             this.backup_actual_user_image = this.userProfileImageURL
-                          
+                            console.log(this.backup_actual_user_image)
                           //  console.log(url)
                         }).catch(function(error) {
                             // Handle any errors
                         });
-                        // })
-                    
+                    // })
+
                      this.$store.dispatch('fetchUserProfileImage', { actualUser: false, userId: this.profileUID }).then(() => {
                           //  var user_image_name = this.$store.getters.getUserProfileImage
                           //  fb.storage.ref().child(`user_profile_image/${user_image_name}`).getDownloadURL().then((url) => {
@@ -599,9 +598,6 @@
             getVisitingUserProfile(){
                 this.$store.dispatch('fetchVisitingUserProfile', { userId: this.profileUID }) 
             },
-            //use async/await to chain promise but maintain order *if not user image is not ordered properly*
-            //https://stackoverflow.com/questions/42964102/syntax-for-async-arrow-function
-            //https://stackoverflow.com/questions/46601552/calling-async-function-in-main-file
             getCommentUserImg(){
                 this.postCommentsPicture = []
                 /*
@@ -610,77 +606,54 @@
                 }
                 */
                 let postCommentImagesArray = []
-
-                let getImages = async () => {
-
-                    for (let comment of this.postComments){
+                this.postComments.forEach(comment => {
+                    if(this.isUserProfile == true){
+                        console.log("1st")
                         if(this.currentUser.uid != comment.userId) {
-                       // console.log(comment.userId)
-                        let userIdData =  await  fb.usersCollection.doc(comment.userId).get()
+                            fb.usersCollection.doc(comment.userId).get().then(res => {
                                 
-                        let userImgURL =  await fb.storage.ref().child(`user_profile_image/${userIdData.data().user_image}`).getDownloadURL()
-                        //   userImgUrl = url
-                        // console.log("userImgUrl = " + userImgUrl)
-                        // console.log(userImgUrl)
-                        postCommentImagesArray.push(userImgURL)
-                           
-                        
+                                fb.storage.ref().child(`user_profile_image/${res.data().user_image}`).getDownloadURL().then((url) => {
+                                    let userImgUrl = url
+                                    postCommentImagesArray.push(userImgUrl)
+                                }) 
+                            }).catch(err => {
+
+                            })
+
                         } else {
-                        // console.log(comment.userId)
-                                if(this.userProfile) {
-                                 //   console.log(this.user_image_url)
-                                    postCommentImagesArray.push(this.user_image_url)
-                                } else {
-                                   // console.log(this.user_image_url)
-                                    postCommentImagesArray.push(this.backup_actual_user_image)
-                                }
+                            postCommentImagesArray.push(this.userProfileImageURL)
+                        
+                        } 
+
+                    } else {
+                        console.log("2nd")
+                        if(this.currentUser.uid != comment.userId) {
+                            console.log("this.currentUser.uid = " + this.currentUser.uid)
+                            console.log("comment.userId = " + comment.userId)
+                            fb.usersCollection.doc(comment.userId).get().then(res => {
+                                
+                                    fb.storage.ref().child(`user_profile_image/${res.data().user_image}`).getDownloadURL().then((url) => {
+                                      //   console.log(url)
+                                        let userImgUrl = url
+                                        postCommentImagesArray.push(userImgUrl)
+                                    }).catch(err => {
+                                    
+                                    })
+                                
+                            })
+                        } else {
+                            console.log("this.currentUser.uid = " + this.currentUser.uid)
+                            console.log("comment.userId = " + comment.userId)
+                            console.log("comment.content = " + comment.content)
+                          //  console.log(this.user_image_url)
+                            postCommentImagesArray.push(this.backup_actual_user_image)
                         
                         } 
                     }
-                }
-
-                getImages().then(result => {
-
-                }).catch(error => {
-                    console.log(error)
-
                 })
-
+                
                 this.postCommentsPicture = postCommentImagesArray
-                /*
-                this.postComments.forEach(comment => {
-                    //    console.log(comment.userId)
-                    if(this.currentUser.uid != comment.userId) {
-                       // console.log(comment.userId)
-                        fb.usersCollection.doc(comment.userId).get().then(res => {
-                            
-                            fb.storage.ref().child(`user_profile_image/${res.data().user_image}`).getDownloadURL().then((url) => {
-                             //   userImgUrl = url
-                               // console.log("userImgUrl = " + userImgUrl)
-                              // console.log(userImgUrl)
-                                postCommentImagesArray.push(url)
-                            }) 
-                           
-                        }).catch(err => {
 
-                        })
-                    } else {
-                       // console.log(comment.userId)
-                            if(this.userProfile) {
-                                console.log(this.user_image_url)
-                                postCommentImagesArray.push(this.user_image_url)
-                            } else {
-                                console.log(this.user_image_url)
-                                postCommentImagesArray.push(this.backup_actual_user_image)
-                            }
-                      
-                    } 
-
-                    
-                })*/
-               // console.log(postCommentImagesArray)
-               // this.postCommentsPicture = postCommentImagesArray
-               // console.log(this.postCommentsPicture) 
                 /*
                 this.$store.dispatch('fetchCommentUserProfileImage', { userId: commentUserId }).then(result => {
                     console.log(result)

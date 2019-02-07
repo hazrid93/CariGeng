@@ -9,6 +9,9 @@ fb.auth.onAuthStateChanged(user => {
   if (user) {
       store.commit('setCurrentUser', user)
       store.dispatch('fetchUserProfile')
+      //need to update profile item when auth state change as well
+      //need to add another one for event created
+      store.dispatch('fetchUserProfileImage', { actualUser: true })
       
       fb.usersCollection.doc(user.uid).onSnapshot(doc => {
         store.commit('setUserProfile', doc.data())
@@ -64,17 +67,23 @@ fb.auth.onAuthStateChanged(user => {
   }
 })
 
+
+// https://stackoverflow.com/questions/49249528/firestore-security-rules-allow-user-access-to-their-data
 export const store =  new Vuex.Store({
     state: {
         theme: null,    
         currentUser: null,
         userProfile: {},
         userProfileImage: '',
+        userProfileImageURL: '',
         posts: [],
         hiddenPosts: [],
         events: [],
         visitingPosts: [],
-        visitingUserProfile: {}
+        visitingUserProfile: {},
+        visitingUserProfileImage: '',
+        visitinguserProfileImageURL: ''
+
 
     },
     //mutations are synhcronous
@@ -107,11 +116,20 @@ export const store =  new Vuex.Store({
         setuserProfileImage(state, val) {
           state.userProfileImage = val
         },
+        setVisitingUserProfileImage(state, val) {
+          state.visitingUserProfileImage = val
+        },
         setVisitingPosts(state, val) {
           state.visitingPosts = val
         },
         setVisitingUserProfile(state, val) {
           state.visitingUserProfile = val
+        },
+        setuserProfileImageURL(state, val) {
+          state.userProfileImageURL = val
+        },
+        setVisitingUserProfileImageURL(state, val) {
+          state.visitingUserProfileImageURL = val
         },
     },
     //actions are asynchronous
@@ -174,6 +192,7 @@ export const store =  new Vuex.Store({
           */
           
         },
+        //check if user dont have image does it triger reject
         fetchUserProfileImage({ commit, state }, profileState) {
           let userId = state.currentUser.uid
           //console.log(userId)
@@ -183,10 +202,19 @@ export const store =  new Vuex.Store({
           return new Promise((resolve, reject) => {
             fb.usersCollection.doc(userId).get().then(res => {
               commit('setuserProfileImage', res.data().user_image)
-              resolve()
+                fb.storage.ref().child(`user_profile_image/${res.data().user_image}`).getDownloadURL().then((url) => {
+                  commit('setuserProfileImageURL', url)
+                  resolve()
+                }).catch(function(error) {
+                    // Handle any errors
+                    reject()
+                });
+              
               // console.log(res.data().user_image)
               }).catch(err => {
-                  console.log(err)
+                //check if profile dont have image does it trigger this one
+                 // commit('setuserProfileImage', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=')
+                  //console.log(err)
                   reject()
               })
           })
@@ -205,6 +233,31 @@ export const store =  new Vuex.Store({
             }).catch(err => {
                 reject()
             })
+          })
+
+        },
+        fetchVisitingUserProfileImage({ commit, state }, profileState) {
+
+          let userId = profileState.userId
+          
+          return new Promise((resolve, reject) => {
+            fb.usersCollection.doc(userId).get().then(res => {
+              commit('setVisitingUserProfileImage', res.data().user_image)
+                fb.storage.ref().child(`user_profile_image/${res.data().user_image}`).getDownloadURL().then((url) => {
+                  commit('setVisitingUserProfileImageURL', url)
+                  resolve()
+                }).catch(function(error) {
+                    // Handle any errors
+                    reject()
+                });
+              
+              // console.log(res.data().user_image)
+              }).catch(err => {
+                //check if profile dont have image does it trigger this one
+                 // commit('setuserProfileImage', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=')
+                  //console.log(err)
+                  reject()
+              })
           })
 
         },
@@ -250,7 +303,10 @@ export const store =  new Vuex.Store({
       },
       getUserProfileImage: (state)=>{
         return state.userProfileImage
-    }
+      },
+      getVisitingUserProfileImage: (state)=>{
+        return state.visitingUserProfileImage
+      }
     }
 })
 

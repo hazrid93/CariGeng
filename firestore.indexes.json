@@ -25,6 +25,19 @@
 			  "mode": "DESCENDING"
 			}
 		  ]
+		},
+		{
+		  "collectionId": "comments",
+		  "fields": [
+			{
+			  "fieldPath": "postId",
+			  "mode": "ASCENDING"
+			},
+			{
+			  "fieldPath": "createdOn",
+			  "mode": "DESCENDING"
+			}
+		  ]
 		}
 	],
   "fieldOverrides": []
