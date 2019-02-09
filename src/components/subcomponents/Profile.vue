@@ -624,22 +624,27 @@
                     iterator = iterator + 1
                 }
 
-                console.log(duplicateUserId)
-                console.log(duplicateUserIdMap)
-
                 let postCommentImagesArray = []
                 //async function to get image
                 let getImages = async () => {
 
                     for (let comment of this.postComments){
                         if(this.currentUser.uid != comment.userId) {
-                            if(duplicateUserId.indexOf(comment.userId) != -1){
-
+                            // https://stackoverflow.com/questions/12462318/find-a-value-in-an-array-of-objects-in-javascript
+                            // finding a particular index in array of object
+                            let objAtIndex = duplicateUserIdMap.find(x => x.userId == `${comment.userId}`)
+                            let indexOfobj = duplicateUserIdMap.indexOf(objAtIndex)
+    
+                            
+                            if(duplicateUserId.indexOf(comment.userId) != -1 && objAtIndex.imageURL == ""){
+                                let userIdData =  await fb.usersCollection.doc(comment.userId).get()           
+                                let userImgURL =  await fb.storage.ref().child(`user_profile_image/${userIdData.data().user_image}`).getDownloadURL()
+                                postCommentImagesArray.push(userImgURL)   
+                                duplicateUserIdMap[indexOfobj].imageURL = userImgURL
+                            } else if(duplicateUserId.indexOf(comment.userId) != -1 && objAtIndex.imageURL != ""){  
+                                postCommentImagesArray.push(duplicateUserIdMap[indexOfobj].imageURL) 
                             }
 
-                            let userIdData =  await  fb.usersCollection.doc(comment.userId).get()           
-                            let userImgURL =  await fb.storage.ref().child(`user_profile_image/${userIdData.data().user_image}`).getDownloadURL()
-                            postCommentImagesArray.push(userImgURL)   
                         } else {
                             if(this.isUserProfile){
                                 postCommentImagesArray.push(this.user_image_url)
