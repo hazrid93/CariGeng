@@ -500,7 +500,7 @@
                         comment.id = doc.id
                         commentsArray.push(comment)
                     })
-                    console.log(commentsArray)
+                    //console.log(commentsArray)
                     this.postComments = commentsArray
                   
                     this.fullPost = post
@@ -536,7 +536,6 @@
                         });
                     
                 } else {
-                    
                     this.backup_actual_user_image = ''
                     
                     this.$store.dispatch('fetchUserProfileImage', { actualUser: true }).then(() => {
@@ -544,8 +543,7 @@
                          //   console.log(user_image_name)
                          //   fb.storage.ref().child(`user_profile_image/${user_image_name}`).getDownloadURL().then((url) => {
                             this.backup_actual_user_image = this.userProfileImageURL
-                          
-                          //  console.log(url)
+
                         }).catch(function(error) {
                             // Handle any errors
                         });
@@ -604,37 +602,51 @@
             //https://stackoverflow.com/questions/46601552/calling-async-function-in-main-file
             getCommentUserImg(){
                 this.postCommentsPicture = []
-                /*
-                for( let i = 0 ; i < this.postComments.length ; i++) {
-                    this.postCommentsPicture.push('data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=')
-                }
-                */
-                let postCommentImagesArray = []
+                let uniqueCommentPictureID = []
 
+                //using 'indexOf' to check if userId existed in array ? *Array.prototype.indexOf*
+                // however IE might not support this. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
+                // so if indexOf is not supported don't do this performance enhancement algorithm
+                let duplicateUserId = []
+                let duplicateUserIdMap = []
+                let iterator = 0
+                for(let comment of this.postComments){
+                   
+                    if(comment.userId != this.currentUser.uid && duplicateUserId.indexOf(comment.userId) == -1){
+                        duplicateUserId.push(comment.userId)
+
+                        let UserIdMap = {}
+                        UserIdMap.userId = comment.userId
+                        UserIdMap.index = iterator
+                        UserIdMap.imageURL = ''
+                        duplicateUserIdMap.push(UserIdMap)
+                    }
+                    iterator = iterator + 1
+                }
+
+                console.log(duplicateUserId)
+                console.log(duplicateUserIdMap)
+
+                let postCommentImagesArray = []
+                //async function to get image
                 let getImages = async () => {
 
                     for (let comment of this.postComments){
                         if(this.currentUser.uid != comment.userId) {
-                       // console.log(comment.userId)
-                        let userIdData =  await  fb.usersCollection.doc(comment.userId).get()
-                                
-                        let userImgURL =  await fb.storage.ref().child(`user_profile_image/${userIdData.data().user_image}`).getDownloadURL()
-                        //   userImgUrl = url
-                        // console.log("userImgUrl = " + userImgUrl)
-                        // console.log(userImgUrl)
-                        postCommentImagesArray.push(userImgURL)
-                           
-                        
+                            if(duplicateUserId.indexOf(comment.userId) != -1){
+
+                            }
+
+                            let userIdData =  await  fb.usersCollection.doc(comment.userId).get()           
+                            let userImgURL =  await fb.storage.ref().child(`user_profile_image/${userIdData.data().user_image}`).getDownloadURL()
+                            postCommentImagesArray.push(userImgURL)   
                         } else {
-                        // console.log(comment.userId)
-                                if(this.userProfile) {
-                                 //   console.log(this.user_image_url)
-                                    postCommentImagesArray.push(this.user_image_url)
-                                } else {
-                                   // console.log(this.user_image_url)
-                                    postCommentImagesArray.push(this.backup_actual_user_image)
-                                }
-                        
+                            if(this.isUserProfile){
+                                postCommentImagesArray.push(this.user_image_url)
+                            } else {
+                                postCommentImagesArray.push(this.backup_actual_user_image)
+                            }
+                            
                         } 
                     }
                 }
