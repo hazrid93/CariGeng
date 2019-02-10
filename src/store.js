@@ -52,6 +52,26 @@ fb.auth.onAuthStateChanged(user => {
     })
 
     //realtime update for events
+    /*
+    if(store.state.currentEventPage == 1){
+      fb.eventsCollection.orderBy('createdOn', 'desc').limit(5).onSnapshot(querySnapshot => {
+        let lastVisible = querySnapshot.docs[querySnapshot.docs.length-1];
+        store.commit('setLastEventDocument', lastVisible)
+
+        let eventsArray = []
+  
+        querySnapshot.forEach(doc => {
+            let post = doc.data()
+            post.id = doc.id
+            eventsArray.push(post)
+        
+        })
+  
+        store.commit('setEvents', eventsArray)
+      })
+    } 
+    */
+
     fb.eventsCollection.orderBy('createdOn', 'desc').onSnapshot(querySnapshot => {
       let eventsArray = []
 
@@ -63,6 +83,7 @@ fb.auth.onAuthStateChanged(user => {
       })
 
       store.commit('setEvents', eventsArray)
+      store.dispatch('fetchEventPageLength')
     })
   }
 })
@@ -82,12 +103,21 @@ export const store =  new Vuex.Store({
         visitingPosts: [],
         visitingUserProfile: {},
         visitingUserProfileImage: '',
-        visitinguserProfileImageURL: ''
+        visitinguserProfileImageURL: '',
+        lastEventDocument: null,
+        currentEventPage: 1,
+        currentPageLength: 1
 
 
     },
     //mutations are synhcronous
     mutations: {
+        setLastEventDocument(state, val) {
+          state.lastEventDocument = val
+        },
+        setCurrentEventPage(state, val) {
+          state.currentEventPage = val
+        },
         changeTheme(state) {
             state.theme = 'black';
         },
@@ -131,9 +161,60 @@ export const store =  new Vuex.Store({
         setVisitingUserProfileImageURL(state, val) {
           state.visitingUserProfileImageURL = val
         },
+        setCurrentPageLength(state, val) {
+          state.currentPageLength = val
+        }
     },
     //actions are asynchronous
     actions: {
+        fetchEventPageLength({ commit, state }){
+          /*
+          fb.eventsCollection.get().then(querySnapshot => {
+            let pageLength = querySnapshot.docs.length
+            pageLength = Math.ceil(pageLength/5)
+            store.commit('setCurrentPageLength', pageLength)
+          })
+          */
+          let pageLength = state.events.length
+          pageLength = Math.ceil(pageLength/5)
+          store.commit('setCurrentPageLength', pageLength)
+         
+        },
+        fetchEventsCollection({ commit, state }) {
+          console.log(state.currentEventPage)
+          let effectivePageIndex = state.currentEventPage
+          effectivePageIndex = effectivePageIndex * 5
+          let startAfterIndex = effectivePageIndex - 5
+          if(startAfterIndex > 0){
+            fb.eventsCollection.orderBy('createdOn', 'desc').limit(startAfterIndex).get().then(querySnapshot => {
+              let lastVisible = querySnapshot.docs[querySnapshot.docs.length-1];
+              store.commit('setLastEventDocument', lastVisible)
+
+              fb.eventsCollection.orderBy('createdOn', 'desc').limit(effectivePageIndex).startAfter(lastVisible).get().then(querySnapshot => {
+                let eventsArray = []
+                querySnapshot.forEach(doc => {
+                    let post = doc.data()
+                    post.id = doc.id
+                    eventsArray.push(post)
+                })
+          
+                store.commit('setEvents', eventsArray)
+              })
+            })
+          } else {
+            fb.eventsCollection.orderBy('createdOn', 'desc').limit(effectivePageIndex).get().then(querySnapshot => {
+              let eventsArray = []
+              querySnapshot.forEach(doc => {
+                  let post = doc.data()
+                  post.id = doc.id
+                  eventsArray.push(post)
+              })
+        
+              store.commit('setEvents', eventsArray)
+            })
+          }
+         
+        },
         fetchVisitingPosts({ commit, state }, profileState) {
           fb.postsCollection.where("userId", "==", profileState.userId).orderBy('createdOn', 'desc').get().then(querySnapshot => {
             let visitingPostsArray = []

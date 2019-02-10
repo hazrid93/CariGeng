@@ -8,7 +8,7 @@ const musixInstance = axios.create({
 //headers.get for get request
 //headers.post for post request
 //headers.common for all type
-//musixInstance.defaults.headers.get['Accepts'] = 'application/jsonss'
+//musixInstance.defaults.headers.get['Accepts'] = 'application/jsons'
 
 
 export default musixInstance

@@ -1,5 +1,6 @@
 <template>
         <v-container fluid fill-height>
+
             <!-- justify-content (vertical), align-items (horizontal) 
                 Note:cannot control xs6 sizes if use column layout -->
                 <!-- <div ref="mapaa" style="height: 400px; width: 700px;"></div> -->
@@ -157,6 +158,13 @@
                         </v-dialog>
 
                         <div v-if="events.length">
+                            <div class="text-xs-center pb-3 pt-3">
+                                <v-pagination
+                                v-model="currentPage"
+                                :length="currentPageLength"
+                                circle
+                                ></v-pagination>
+                            </div>
                             <template v-for="(event, index) in events">
                                 <v-card :key="event.title" class="mb-4">
                                     <v-img src="https://cdn.vuetifyjs.com/images/cards/house.jpg" height="200px" > 
@@ -252,6 +260,7 @@
                     longitude: 0.0,
                     content: ''
                 },
+                currentPage: 1,
                 dialogPostEvent: false,
                 dialogEvent: false,
                 notifications: false,
@@ -305,6 +314,12 @@
                 html: 'Update content to see changes',
             }   
         },
+        watch: {
+            currentPage () {
+                this.$store.commit('setCurrentEventPage',this.currentPage)
+                this.$store.dispatch('fetchEventsCollection')
+            }
+        },
         components: {
             EditorContent,
             EditorMenuBar,
@@ -315,7 +330,7 @@
             //use mapGetters to get all the getters specified in store.js
             //will use mapState for now
  
-            ...mapState(['userProfile','currentUser','events'])
+            ...mapState(['userProfile','currentUser','events','currentPageLength'])
         },
         methods: {
             onResize () {
@@ -440,6 +455,7 @@
         mounted () {
             this.onResize()
             window.addEventListener('resize', this.onResize, { passive: true })
+            this.$store.dispatch('fetchEventPageLength')
         },
         beforeDestroy () {
             if (typeof window !== 'undefined') {
