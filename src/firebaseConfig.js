@@ -8,12 +8,12 @@ import 'firebase/messaging'
 
 // firebase init goes here
 const config = {
-    apiKey: "AIzaSyCMXzv3qHr7nhO6lVN7uPh85GBOO0pyR44",
-    authDomain: "my-project-1536942914988.firebaseapp.com",
-    databaseURL: "https://my-project-1536942914988.firebaseio.com",
-    projectId: "my-project-1536942914988",
-    storageBucket: "my-project-1536942914988.appspot.com",
-    messagingSenderId: "571219777796"
+    apiKey: <API_KEY>,
+    authDomain: <AUTH_DOMAIN>,
+    databaseURL: <DATABASE_URL>,
+    projectId: <PROJECT_ID>,
+    storageBucket: <STORAGE>,
+    messagingSenderId: <MESSAGING_ID>
   };
 firebase.initializeApp(config)
 
